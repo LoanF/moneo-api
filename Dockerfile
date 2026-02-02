@@ -2,26 +2,26 @@
 FROM node:20-alpine AS builder
 WORKDIR /usr/src/app
 
-RUN npm install -g pnpm
+RUN corepack enable
 
-COPY pnpm-lock.yaml package.json ./
+COPY package.json pnpm-lock.yaml ./
 RUN pnpm install --frozen-lockfile
 
 COPY . .
 
 RUN pnpm run build
 
+RUN pnpm prune --prod
+
 # --- Étape 2 : Production ---
 FROM node:20-alpine
 WORKDIR /usr/src/app
 
-RUN npm install -g pnpm
+RUN corepack enable
 
 COPY --from=builder /usr/src/app/dist ./dist
-COPY --from=builder /usr/src/app/package*.json ./
-COPY --from=builder /usr/src/app/pnpm-lock.yaml ./
-
-RUN pnpm install --prod --frozen-lockfile
+COPY --from=builder /usr/src/app/node_modules ./node_modules
+COPY --from=builder /usr/src/app/package.json ./
 
 EXPOSE 3000
-CMD ["pnpm", "start"]
+CMD ["node", "dist/index.js"]
