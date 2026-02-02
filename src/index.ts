@@ -8,7 +8,11 @@ import { EventEmitter } from 'node:events';
 
 import sequelize from './config/database.js';
 import authRoutes from './routes/auth.js';
+import accountRoutes from './routes/account.js';
+
+// Import models to register them with Sequelize
 import './models/User.js'
+import './models/Account.js';
 
 import pkg from '../package.json' with { type: 'json' };
 
@@ -56,6 +60,7 @@ app.openAPIRegistry.registerComponent('securitySchemes', 'Bearer', {
 
 app.get('/', (c) => c.text('Moneo API is Live'));
 app.route('/api/auth', authRoutes);
+app.route('/api/accounts', accountRoutes);
 
 app.get('/api/realtime', async (c) => {
   return streamSSE(c, async (stream) => {
