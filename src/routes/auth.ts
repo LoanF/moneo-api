@@ -2,7 +2,7 @@ import { OpenAPIHono } from '@hono/zod-openapi';
 import { sign, verify } from 'hono/jwt';
 import bcrypt from 'bcryptjs';
 import { OAuth2Client } from 'google-auth-library';
-import { UniqueConstraintError } from 'sequelize';
+import {Transaction, UniqueConstraintError} from 'sequelize';
 import sequelize from '../config/database.js';
 import User from '../models/User.js';
 import { googleRoute, loginRoute, refreshRoute, registerRoute } from './auth.definitions.js';
@@ -22,6 +22,25 @@ const generateTokens = async (userId: number, email: string): Promise<{ accessTo
     return { accessToken, refreshToken };
 };
 
+const authSuccessResponse = async (c: any, user: User, status: 200 | 201 = 200, transaction?: Transaction) => {
+    const tokens = await generateTokens(user.id, user.email);
+
+    user.refreshToken = tokens.refreshToken;
+    await user.save({ transaction });
+
+    return c.json({
+        ...tokens,
+        user: {
+            uid: String(user.id),
+            displayName: user.username,
+            email: user.email,
+            photoUrl: user.photoUrl || null,
+            fcmToken: user.fcmToken || null,
+            hasCompletedSetup: user.hasCompletedSetup
+        }
+    }, status);
+};
+
 auth.openapi(registerRoute, async (c) => {
     const transaction = await sequelize.transaction();
     try {
@@ -34,21 +53,9 @@ auth.openapi(registerRoute, async (c) => {
             password: hashedPassword
         }, { transaction });
 
-        const tokens = await generateTokens(user.id, user.email);
-
-        user.refreshToken = tokens.refreshToken;
-        await user.save({ transaction });
-
+        const response = await authSuccessResponse(c, user, 201, transaction);
         await transaction.commit();
-
-        return c.json({
-            ...tokens,
-            user: {
-                uid: String(user.get('id')),
-                displayName: user.username,
-                email: user.email
-            }
-        }, 201);
+        return response;
     } catch (error) {
         await transaction.rollback();
         const msg = error instanceof UniqueConstraintError ? "Email déjà utilisé" : "Erreur lors de l'inscription";
@@ -61,12 +68,7 @@ auth.openapi(loginRoute, async (c) => {
     const user = await User.findOne({ where: { email: email.toLowerCase() } });
 
     if (user && user.password && await bcrypt.compare(password, user.password)) {
-        const tokens = await generateTokens(user.id, user.email);
-
-        user.refreshToken = tokens.refreshToken;
-        await user.save();
-
-        return c.json({ ...tokens, user: { uid: user.id.toString(), displayName: user.username, email: user.email } }, 200);
+        return authSuccessResponse(c, user, 200);
     }
     return c.json({ error: "Identifiants incorrects" }, 401);
 });
@@ -79,27 +81,25 @@ auth.openapi(googleRoute, async (c) => {
 
         if (!payload || !payload.email) return c.json({ error: "Token Google invalide" }, 403);
 
-        const { sub, email, name } = payload;
+        const { sub, email, name, picture } = payload;
 
         const [user, created] = await User.findOrCreate({
             where: { email },
             defaults: {
                 username: name || 'User',
                 email: email,
-                googleId: sub
+                googleId: sub,
+                photoUrl: picture || null
             }
         });
 
         if (!created && !user.googleId) {
             user.googleId = sub;
+            if (!user.photoUrl && picture) user.photoUrl = picture;
             await user.save();
         }
 
-        const tokens = await generateTokens(user.id, user.email);
-        user.refreshToken = tokens.refreshToken;
-        await user.save();
-
-        return c.json({ ...tokens, user: { uid: user.id.toString(), displayName: user.username, email: user.email } }, 200);
+        return authSuccessResponse(c, user, 200);
     } catch (error) {
         return c.json({ error: "Authentification Google échouée" }, 403);
     }

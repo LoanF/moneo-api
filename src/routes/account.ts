@@ -1,5 +1,5 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
-import Account from '../models/Account.js';
+import BankAccount from '../models/BankAccount.js';
 import { authMiddleware } from '../middleware/auth.js';
 import {createAccountRoute, listAccountsRoute} from "./account.definitions.js";
 
@@ -9,7 +9,7 @@ accounts.use('*', authMiddleware);
 
 accounts.openapi(listAccountsRoute, async (c) => {
     const user = c.get('jwtPayload');
-    const list = await Account.findAll({ where: { userId: user.id } });
+    const list = await BankAccount.findAll({ where: { userId: user.id } });
     return c.json(list, 200);
 });
 
@@ -18,7 +18,7 @@ accounts.openapi(createAccountRoute, async (c) => {
     const body = c.req.valid('json');
 
     try {
-        const account = await Account.create({
+        const account = await BankAccount.create({
             ...body,
             userId: user.id
         });

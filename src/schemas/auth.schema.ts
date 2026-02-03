@@ -1,4 +1,4 @@
-import { z } from "@hono/zod-openapi";
+import {z} from "@hono/zod-openapi";
 
 export const RegisterSchema = z.object({
     username: z.string().min(3, "Le nom d'utilisateur doit contenir au moins 3 caractères"),
@@ -30,7 +30,10 @@ export const AuthResponseSchema = z.object({
     user: z.object({
         uid: z.string(),
         displayName: z.string(),
-        email: z.string()
+        email: z.string(),
+        photoUrl: z.string().nullable(),
+        fcmToken: z.string().nullable(),
+        hasCompletedSetup: z.boolean(),
     })
 }).openapi('AuthResponse');
 

@@ -5,16 +5,19 @@ import { cors } from 'hono/cors';
 import { swaggerUI } from '@hono/swagger-ui';
 import { streamSSE } from 'hono/streaming';
 import { EventEmitter } from 'node:events';
-
 import sequelize from './config/database.js';
+
+// Routes
 import authRoutes from './routes/auth.js';
 import accountRoutes from './routes/account.js';
 import categoryRoutes from './routes/category.js';
+import paymentMethodRoutes from './routes/paymentMethod.js';
 
 // Import models to register them with Sequelize
 import './models/User.js'
-import './models/Account.js';
+import './models/BankAccount.js';
 import './models/Category.js';
+import './models/PaymentMethod.js';
 
 import pkg from '../package.json' with { type: 'json' };
 
@@ -64,6 +67,7 @@ app.get('/', (c) => c.text('Moneo API is Live'));
 app.route('/api/auth', authRoutes);
 app.route('/api/accounts', accountRoutes);
 app.route('/api/categories', categoryRoutes);
+app.route('/api/payment-methods', paymentMethodRoutes);
 
 app.get('/api/realtime', async (c) => {
   return streamSSE(c, async (stream) => {

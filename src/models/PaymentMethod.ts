@@ -1,0 +1,39 @@
+import { DataTypes, Model, type Optional } from 'sequelize';
+import sequelize from '../config/database.js';
+import User from './User.js';
+
+interface PaymentMethodAttributes {
+    id: number;
+    name: string;
+    type: 'credit' | 'debit';
+    userId: number;
+}
+
+export interface PaymentMethodCreationAttributes extends Optional<PaymentMethodAttributes, 'id'> {}
+
+class PaymentMethod extends Model<PaymentMethodAttributes, PaymentMethodCreationAttributes> implements PaymentMethodAttributes {
+    declare id: number;
+    declare name: string;
+    declare type: 'credit' | 'debit';
+    declare userId: number;
+}
+
+PaymentMethod.init({
+    id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    name: { type: DataTypes.STRING, allowNull: false },
+    type: {
+        type: DataTypes.ENUM('credit', 'debit'),
+        allowNull: false,
+        defaultValue: 'debit'
+    },
+    userId: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        references: { model: 'Users', key: 'id' }
+    },
+}, { sequelize, modelName: 'PaymentMethod' });
+
+User.hasMany(PaymentMethod, { foreignKey: 'userId', as: 'paymentMethods' });
+PaymentMethod.belongsTo(User, { foreignKey: 'userId' });
+
+export default PaymentMethod;

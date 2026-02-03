@@ -2,7 +2,7 @@ import { DataTypes, Model, type Optional } from 'sequelize';
 import sequelize from '../config/database.js';
 import User from './User.js';
 
-interface AccountAttributes {
+interface BankAccountAttributes {
     id: number;
     userId: number;
     name: string;
@@ -11,9 +11,9 @@ interface AccountAttributes {
     currency: string;
 }
 
-interface AccountCreationAttributes extends Optional<AccountAttributes, 'id' | 'balance' | 'currency'> {}
+interface BankAccountCreationAttributes extends Optional<BankAccountAttributes, 'id' | 'balance' | 'currency'> {}
 
-class Account extends Model<AccountAttributes, AccountCreationAttributes> implements AccountAttributes {
+class BankAccount extends Model<BankAccountAttributes, BankAccountCreationAttributes> implements BankAccountAttributes {
     public id!: number;
     public userId!: number;
     public name!: string;
@@ -22,7 +22,7 @@ class Account extends Model<AccountAttributes, AccountCreationAttributes> implem
     public currency!: string;
 }
 
-Account.init({
+BankAccount.init({
     id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
     userId: {
         type: DataTypes.INTEGER,
@@ -35,10 +35,10 @@ Account.init({
     currency: { type: DataTypes.STRING, allowNull: false, defaultValue: 'EUR' },
 }, {
     sequelize,
-    modelName: 'Account',
+    modelName: 'BankAccount',
 });
 
-User.hasMany(Account, { foreignKey: 'userId', as: 'accounts' });
-Account.belongsTo(User, { foreignKey: 'userId', as: 'owner' });
+User.hasMany(BankAccount, { foreignKey: 'userId', as: 'accounts' });
+BankAccount.belongsTo(User, { foreignKey: 'userId', as: 'owner' });
 
-export default Account;
+export default BankAccount;
