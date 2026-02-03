@@ -13,12 +13,12 @@ interface UserAttributes {
 interface UserCreationAttributes extends Optional<UserAttributes, 'id'> {}
 
 class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
-    public id!: number;
-    public username!: string;
-    public email!: string;
-    public password?: string;
-    public googleId?: string;
-    public refreshToken?: string;
+    declare id: number;
+    declare username: string;
+    declare email: string;
+    declare password?: string;
+    declare googleId?: string;
+    declare refreshToken?: string;
 
     public readonly createdAt!: Date;
     public readonly updatedAt!: Date;

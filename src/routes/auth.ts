@@ -28,17 +28,14 @@ auth.openapi(registerRoute, async (c) => {
         const body = c.req.valid('json');
         const hashedPassword = await bcrypt.hash(body.password, 10);
 
-        // Création de l'utilisateur
         const user = await User.create({
             username: body.username,
             email: body.email.toLowerCase(),
             password: hashedPassword
         }, { transaction });
 
-        // Génération des tokens
         const tokens = await generateTokens(user.id, user.email);
 
-        // Sauvegarde du refresh token
         user.refreshToken = tokens.refreshToken;
         await user.save({ transaction });
 
@@ -47,7 +44,7 @@ auth.openapi(registerRoute, async (c) => {
         return c.json({
             ...tokens,
             user: {
-                uid: String(user.id),
+                uid: String(user.get('id')),
                 displayName: user.username,
                 email: user.email
             }

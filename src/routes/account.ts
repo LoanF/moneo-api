@@ -8,7 +8,7 @@ const accounts = new OpenAPIHono();
 accounts.use('*', authMiddleware);
 
 accounts.openapi(listAccountsRoute, async (c) => {
-    const user = c.get('jwtPayload'); // Récupéré via authMiddleware
+    const user = c.get('jwtPayload');
     const list = await Account.findAll({ where: { userId: user.id } });
     return c.json(list, 200);
 });
