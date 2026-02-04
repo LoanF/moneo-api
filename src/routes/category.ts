@@ -1,7 +1,7 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
 import Category from '../models/Category.js';
 import { authMiddleware } from '../middleware/auth.js';
-import { createCategoryRoute, listCategoriesRoute } from './category.definitions.js';
+import { createCategoryRoute, listCategoriesRoute } from '../definitions/category.definitions.js';
 
 const categories = new OpenAPIHono();
 

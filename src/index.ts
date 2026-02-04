@@ -13,12 +13,14 @@ import authRoutes from './routes/auth.js';
 import accountRoutes from './routes/account.js';
 import categoryRoutes from './routes/category.js';
 import paymentMethodRoutes from './routes/paymentMethod.js';
+import monthlyPaymentRoutes from './routes/monthlyPayment.js';
 
 // Import models to register them with Sequelize
 import './models/User.js'
 import './models/BankAccount.js';
 import './models/Category.js';
 import './models/PaymentMethod.js';
+import './models/MonthlyPayment.js';
 
 import pkg from '../package.json' with { type: 'json' };
 
@@ -92,6 +94,7 @@ app.route('/api/auth', authRoutes);
 app.route('/api/accounts', accountRoutes);
 app.route('/api/categories', categoryRoutes);
 app.route('/api/payment-methods', paymentMethodRoutes);
+app.route('/api/monthly-payments', monthlyPaymentRoutes);
 
 app.get('/api/realtime', authMiddleware, async (c) => {
   const user = c.get('jwtPayload');
