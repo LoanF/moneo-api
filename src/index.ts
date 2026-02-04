@@ -11,7 +11,7 @@ import { processMonthlyPayments } from './services/monthlyProcessor.js';
 
 // Routes
 import authRoutes from './routes/auth.js';
-import accountRoutes from './routes/account.js';
+import accountRoutes from './routes/bankAccount.js';
 import categoryRoutes from './routes/category.js';
 import paymentMethodRoutes from './routes/paymentMethod.js';
 import monthlyPaymentRoutes from './routes/monthlyPayment.js';

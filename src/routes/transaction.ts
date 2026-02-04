@@ -3,7 +3,7 @@ import Transaction from '../models/Transaction.js';
 import BankAccount from '../models/BankAccount.js';
 import Category from '../models/Category.js';
 import { authMiddleware } from '../middleware/auth.js';
-import {createTransactionRoute, listTransactionsRoute, deleteTransactionRoute, createTransferRoute, getStatsRoute} from '../definitions/transaction.definitions.js';
+import {createTransactionRoute, listTransactionsRoute, deleteTransactionRoute, createTransferRoute, getStatsRoute, updateTransactionRoute} from '../definitions/transaction.definitions.js';
 import sequelize from '../config/database.js';
 import { Op, fn, col } from 'sequelize';
 
@@ -221,6 +221,51 @@ transactions.openapi(getStatsRoute, async (c) => {
         netChange: totalIncome - totalExpense,
         byCategory
     }, 200);
+});
+
+transactions.openapi(updateTransactionRoute, async (c) => {
+    const user = c.get('jwtPayload');
+    const { id } = c.req.valid('param');
+    const body = c.req.valid('json');
+
+    const t = await sequelize.transaction();
+
+    try {
+        const transaction = await Transaction.findOne({
+            where: { id: Number(id), userId: user.id },
+            transaction: t
+        });
+
+        if (!transaction) {
+            await t.rollback();
+            return c.json({ error: "Transaction introuvable" }, 404);
+        }
+
+        const account = await BankAccount.findByPk(transaction.accountId, { transaction: t });
+        if (!account) {
+            await t.rollback();
+            return c.json({ error: "Compte bancaire associé introuvable" }, 404);
+        }
+
+        const oldAmount = Number(transaction.amount);
+        const reverseAdjustment = transaction.type === 'income' ? -oldAmount : oldAmount;
+        account.balance = Number(account.balance) + reverseAdjustment;
+
+        await transaction.update(body, { transaction: t });
+
+        const newAmount = Number(transaction.amount);
+        const newAdjustment = transaction.type === 'income' ? newAmount : -newAmount;
+        account.balance = Number(account.balance) + newAdjustment;
+
+        await account.save({ transaction: t });
+        await t.commit();
+
+        return c.json(transaction, 200);
+
+    } catch (error: any) {
+        if (t) await t.rollback();
+        return c.json({ error: error.message || "Erreur interne" }, 400);
+    }
 });
 
 export default transactions;

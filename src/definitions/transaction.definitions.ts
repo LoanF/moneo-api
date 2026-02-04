@@ -109,3 +109,21 @@ export const getStatsRoute = createRoute({
         }
     }
 });
+
+export const updateTransactionSchema = CreateTransactionSchema.partial();
+
+export const updateTransactionRoute = createRoute({
+    method: 'patch',
+    path: '/{id}',
+    tags: ['Transactions'],
+    security: [{ Bearer: [] }],
+    request: {
+        params: z.object({ id: z.string() }),
+        body: { content: { 'application/json': { schema: updateTransactionSchema } } }
+    },
+    responses: {
+        200: { content: { 'application/json': { schema: TransactionResponseSchema } }, description: 'Transaction mise à jour' },
+        400: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Erreur de validation ou solde insuffisant' },
+        404: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Non trouvée' }
+    }
+});

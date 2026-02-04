@@ -1,5 +1,6 @@
 import {createRoute, z} from '@hono/zod-openapi';
 import {RegisterSchema, AuthResponseSchema, ErrorSchema, LoginSchema, GoogleSchema, RefreshSchema, RefreshResponseSchema} from '../schemas/auth.schema.js';
+import {BankAccountResponseSchema, CreateBankAccountSchema} from "../schemas/bankAccountResponseSchema.js";
 
 export const registerRoute = createRoute({
     method: 'post',
@@ -104,5 +105,22 @@ export const uploadAvatarRoute = createRoute({
             content: { 'application/json': { schema: ErrorSchema } },
             description: 'Requête invalide ou fichier manquant'
         }
+    }
+});
+
+export const updateAccountSchema = CreateBankAccountSchema.partial();
+
+export const updateAccountRoute = createRoute({
+    method: 'patch',
+    path: '/{id}',
+    tags: ['Accounts'],
+    security: [{ Bearer: [] }],
+    request: {
+        params: z.object({ id: z.string() }),
+        body: { content: { 'application/json': { schema: updateAccountSchema } } }
+    },
+    responses: {
+        200: { content: { 'application/json': { schema: BankAccountResponseSchema } }, description: 'Modifié' },
+        404: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Non trouvé' }
     }
 });
