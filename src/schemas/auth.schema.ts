@@ -8,16 +8,19 @@ export const RegisterSchema = z.object({
         .regex(/[A-Z]/, "Il faut au moins une majuscule")
         .regex(/[a-z]/, "Il faut au moins une minuscule")
         .regex(/[0-9]/, "Il faut au moins un chiffre")
-        .regex(/[^A-Za-z0-9]/, "Il faut au moins un symbole")
+        .regex(/[^A-Za-z0-9]/, "Il faut au moins un symbole"),
+    fcmToken: z.string().optional()
 }).openapi('RegisterInput');
 
 export const LoginSchema = z.object({
     email: z.string().email(),
-    password: z.string()
+    password: z.string(),
+    fcmToken: z.string().optional()
 }).openapi('LoginInput');
 
 export const GoogleSchema = z.object({
-    idToken: z.string()
+    idToken: z.string(),
+    fcmToken: z.string().optional()
 }).openapi('GoogleInput');
 
 export const RefreshSchema = z.object({

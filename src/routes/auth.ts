@@ -22,10 +22,15 @@ const generateTokens = async (userId: number, email: string): Promise<{ accessTo
     return { accessToken, refreshToken };
 };
 
-const authSuccessResponse = async (c: any, user: User, status: 200 | 201 = 200, transaction?: Transaction) => {
+const authSuccessResponse = async (c: any, user: User, fcmToken?: string, status: 200 | 201 = 200, transaction?: Transaction) => {
     const tokens = await generateTokens(user.id, user.email);
 
     user.refreshToken = tokens.refreshToken;
+
+    if (fcmToken) {
+        user.fcmToken = fcmToken;
+    }
+
     await user.save({ transaction });
 
     return c.json({
@@ -53,7 +58,7 @@ auth.openapi(registerRoute, async (c) => {
             password: hashedPassword
         }, { transaction });
 
-        const response = await authSuccessResponse(c, user, 201, transaction);
+        const response = await authSuccessResponse(c, user, body.fcmToken, 201, transaction);
         await transaction.commit();
         return response;
     } catch (error) {
@@ -64,18 +69,18 @@ auth.openapi(registerRoute, async (c) => {
 });
 
 auth.openapi(loginRoute, async (c) => {
-    const { email, password } = c.req.valid('json');
+    const { email, password, fcmToken } = c.req.valid('json');
     const user = await User.findOne({ where: { email: email.toLowerCase() } });
 
     if (user && user.password && await bcrypt.compare(password, user.password)) {
-        return authSuccessResponse(c, user, 200);
+        return authSuccessResponse(c, user, fcmToken, 200);
     }
     return c.json({ error: "Identifiants incorrects" }, 401);
 });
 
 auth.openapi(googleRoute, async (c) => {
     try {
-        const { idToken } = c.req.valid('json');
+        const { idToken, fcmToken } = c.req.valid('json');
         const ticket = await client.verifyIdToken({ idToken, audience: process.env.GOOGLE_CLIENT_ID });
         const payload = ticket.getPayload();
 
@@ -96,10 +101,10 @@ auth.openapi(googleRoute, async (c) => {
         if (!created && !user.googleId) {
             user.googleId = sub;
             if (!user.photoUrl && picture) user.photoUrl = picture;
-            await user.save();
+            if (!fcmToken) await user.save();
         }
 
-        return authSuccessResponse(c, user, 200);
+        return authSuccessResponse(c, user, fcmToken, 200);
     } catch (error) {
         return c.json({ error: "Authentification Google échouée" }, 403);
     }
