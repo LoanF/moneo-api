@@ -1,5 +1,6 @@
 import {DataTypes, Model, type Optional} from 'sequelize';
 import sequelize from '../config/database.js';
+import {hashPassword} from "../utils/password.js";
 
 interface UserAttributes {
     id: number;
@@ -25,9 +26,6 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
     declare fcmToken: string | null;
     declare hasCompletedSetup: boolean;
     declare photoUrl: string | null;
-
-    public readonly createdAt!: Date;
-    public readonly updatedAt!: Date;
 }
 
 User.init({
@@ -43,6 +41,12 @@ User.init({
 }, {
     sequelize,
     modelName: 'User',
+});
+
+User.addHook('beforeSave', async (user: User) => {
+    if (user.changed('password') && user.password) {
+        user.password = await hashPassword(user.password);
+    }
 });
 
 export default User;

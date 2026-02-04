@@ -20,8 +20,9 @@ monthlyPayments.openapi(createMonthlyPaymentRoute, async (c) => {
     try {
         const payment = await MonthlyPayment.create({
             ...body,
-            userId: user.id
+            userId: Number(user.id)
         });
+
         return c.json(payment, 201);
     } catch (error: any) {
         return c.json({ error: error.message }, 400);

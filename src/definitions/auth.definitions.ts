@@ -1,4 +1,4 @@
-import { createRoute } from '@hono/zod-openapi';
+import {createRoute, z} from '@hono/zod-openapi';
 import {RegisterSchema, AuthResponseSchema, ErrorSchema, LoginSchema, GoogleSchema, RefreshSchema, RefreshResponseSchema} from '../schemas/auth.schema.js';
 
 export const registerRoute = createRoute({
@@ -48,5 +48,61 @@ export const refreshRoute = createRoute({
         200: { content: { 'application/json': { schema: RefreshResponseSchema } }, description: 'Succès' },
         401: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Token manquant' },
         403: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Token invalide' }
+    }
+});
+
+export const updateProfileRoute = createRoute({
+    method: 'patch',
+    path: '/profile',
+    summary: 'Mettre à jour le profil',
+    tags: ['Auth'],
+    security: [{ Bearer: [] }],
+    request: {
+        body: {
+            content: {
+                'application/json': {
+                    schema: z.object({
+                        displayName: z.string().optional(),
+                        photoURL: z.string().optional(),
+                        hasCompletedSetup: z.boolean().optional(),
+                    })
+                }
+            }
+        }
+    },
+    responses: {
+        200: {
+            content: { 'application/json': { schema: z.object({ success: z.boolean() }) } },
+            description: 'Profil mis à jour'
+        }
+    }
+});
+
+export const uploadAvatarRoute = createRoute({
+    method: 'post',
+    path: '/upload-avatar',
+    summary: 'Uploader une photo de profil',
+    tags: ['Auth'],
+    security: [{ Bearer: [] }],
+    request: {
+        body: {
+            content: {
+                'multipart/form-data': {
+                    schema: z.object({
+                        avatar: z.any().openapi({ type: 'string', format: 'binary' })
+                    })
+                }
+            }
+        }
+    },
+    responses: {
+        200: {
+            content: { 'application/json': { schema: z.object({ url: z.string() }) } },
+            description: 'Image uploadée avec succès'
+        },
+        400: {
+            content: { 'application/json': { schema: ErrorSchema } },
+            description: 'Requête invalide ou fichier manquant'
+        }
     }
 });

@@ -3,18 +3,19 @@ import { z } from "@hono/zod-openapi";
 export const MonthlyPaymentResponseSchema = z.object({
     id: z.number(),
     userId: z.number(),
-    categoryId: z.number(),
     name: z.string(),
     amount: z.number(),
-    dayOfMonth: z.number().min(1).max(31),
-    type: z.enum(['credit', 'debit']),
-    lastAppliedMonth: z.date().nullable(),
-}).openapi('MonthlyPaymentResponse');
+    accountId: z.number(),
+    categoryId: z.number().nullable(),
+    dayOfMonth: z.number(),
+    type: z.enum(['income', 'expense']),
+}).openapi('CreateMonthlyPaymentInput');
 
 export const CreateMonthlyPaymentSchema = z.object({
     name: z.string().min(1),
     amount: z.number(),
-    categoryId: z.number(),
+    accountId: z.number(),
+    categoryId: z.number().optional().nullable(),
     dayOfMonth: z.number().min(1).max(31),
-    type: z.enum(['credit', 'debit']),
+    type: z.enum(['income', 'expense']),
 }).openapi('CreateMonthlyPaymentInput');
