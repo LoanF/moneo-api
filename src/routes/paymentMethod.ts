@@ -1,7 +1,7 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
 import PaymentMethod from '../models/PaymentMethod.js';
 import { authMiddleware } from '../middleware/auth.js';
-import { createPaymentMethodRoute, listPaymentMethodsRoute } from '../definitions/paymentMethod.definitions.js';
+import {createPaymentMethodRoute, deletePaymentMethodRoute, listPaymentMethodsRoute, updatePaymentMethodRoute} from '../definitions/paymentMethod.definitions.js';
 
 const paymentMethods = new OpenAPIHono();
 
@@ -26,6 +26,28 @@ paymentMethods.openapi(createPaymentMethodRoute, async (c) => {
     } catch (error: any) {
         return c.json({ error: error.message }, 400);
     }
+});
+
+paymentMethods.openapi(updatePaymentMethodRoute, async (c) => {
+    const user = c.get('jwtPayload');
+    const { id } = c.req.valid('param');
+    const body = c.req.valid('json');
+
+    const method = await PaymentMethod.findOne({ where: { id: Number(id), userId: user.id } });
+    if (!method) return c.json({ error: "Moyen de paiement introuvable" }, 404);
+
+    await method.update(body);
+    return c.json(method, 200);
+});
+
+paymentMethods.openapi(deletePaymentMethodRoute, async (c) => {
+    const user = c.get('jwtPayload');
+    const { id } = c.req.valid('param');
+
+    const deleted = await PaymentMethod.destroy({ where: { id: Number(id), userId: user.id } });
+    if (!deleted) return c.json({ error: "Moyen de paiement introuvable" }, 404);
+
+    return c.json({ success: true }, 200);
 });
 
 export default paymentMethods;

@@ -1,6 +1,5 @@
 import {createRoute, z} from '@hono/zod-openapi';
-import {RegisterSchema, AuthResponseSchema, ErrorSchema, LoginSchema, GoogleSchema, RefreshSchema, RefreshResponseSchema} from '../schemas/auth.schema.js';
-import {BankAccountResponseSchema, CreateBankAccountSchema} from "../schemas/bankAccountResponseSchema.js";
+import {RegisterSchema, AuthResponseSchema, ErrorSchema, LoginSchema, GoogleSchema, RefreshSchema, RefreshResponseSchema, UserSchema, UpdateProfileSchema} from '../schemas/auth.schema.js';
 
 export const registerRoute = createRoute({
     method: 'post',
@@ -55,27 +54,25 @@ export const refreshRoute = createRoute({
 export const updateProfileRoute = createRoute({
     method: 'patch',
     path: '/profile',
-    summary: 'Mettre à jour le profil',
-    tags: ['Auth'],
+    summary: 'Mettre à jour le profil utilisateur',
+    tags: ['Authentification'],
     security: [{ Bearer: [] }],
     request: {
         body: {
             content: {
                 'application/json': {
-                    schema: z.object({
-                        displayName: z.string().optional(),
-                        photoURL: z.string().optional(),
-                        hasCompletedSetup: z.boolean().optional(),
-                    })
+                    schema: UpdateProfileSchema
                 }
             }
         }
     },
     responses: {
         200: {
-            content: { 'application/json': { schema: z.object({ success: z.boolean() }) } },
-            description: 'Profil mis à jour'
-        }
+            content: { 'application/json': { schema: UserSchema } },
+            description: 'Profil mis à jour avec succès'
+        },
+        400: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Erreur' },
+        404: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Utilisateur non trouvé' }
     }
 });
 
@@ -83,7 +80,7 @@ export const uploadAvatarRoute = createRoute({
     method: 'post',
     path: '/upload-avatar',
     summary: 'Uploader une photo de profil',
-    tags: ['Auth'],
+    tags: ['Authentification'],
     security: [{ Bearer: [] }],
     request: {
         body: {
@@ -108,19 +105,25 @@ export const uploadAvatarRoute = createRoute({
     }
 });
 
-export const updateAccountSchema = CreateBankAccountSchema.partial();
-
-export const updateAccountRoute = createRoute({
-    method: 'patch',
-    path: '/{id}',
-    tags: ['Accounts'],
+export const meRoute = createRoute({
+    method: 'get',
+    path: '/me',
+    summary: 'Récupérer le profil actuel',
+    tags: ['Authentification'],
     security: [{ Bearer: [] }],
-    request: {
-        params: z.object({ id: z.string() }),
-        body: { content: { 'application/json': { schema: updateAccountSchema } } }
-    },
     responses: {
-        200: { content: { 'application/json': { schema: BankAccountResponseSchema } }, description: 'Modifié' },
-        404: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Non trouvé' }
+        200: { content: { 'application/json': { schema: UserSchema } }, description: 'Succès' },
+        401: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Non authentifié' }
+    }
+});
+
+export const logoutRoute = createRoute({
+    method: 'post',
+    path: '/logout',
+    summary: 'Déconnexion (Révocation du refresh token)',
+    tags: ['Authentification'],
+    security: [{ Bearer: [] }],
+    responses: {
+        200: { content: { 'application/json': { schema: z.object({ success: z.boolean() }) } }, description: 'Déconnecté' }
     }
 });

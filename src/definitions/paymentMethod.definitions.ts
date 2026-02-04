@@ -1,5 +1,5 @@
-import { createRoute } from '@hono/zod-openapi';
-import { PaymentMethodResponseSchema, CreatePaymentMethodSchema } from '../schemas/paymentMethod.schema.js';
+import {createRoute, z} from '@hono/zod-openapi';
+import {PaymentMethodResponseSchema, CreatePaymentMethodSchema, UpdatePaymentMethodSchema} from '../schemas/paymentMethod.schema.js';
 import { ErrorSchema } from '../schemas/auth.schema.js';
 
 export const listPaymentMethodsRoute = createRoute({
@@ -29,5 +29,33 @@ export const createPaymentMethodRoute = createRoute({
             description: 'Moyen de paiement créé'
         },
         400: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Erreur' }
+    }
+});
+
+
+export const updatePaymentMethodRoute = createRoute({
+    method: 'patch',
+    path: '/{id}',
+    tags: ['Moyens de Paiement'],
+    security: [{ Bearer: [] }],
+    request: {
+        params: z.object({ id: z.string() }),
+        body: { content: { 'application/json': { schema: UpdatePaymentMethodSchema } } }
+    },
+    responses: {
+        200: { content: { 'application/json': { schema: PaymentMethodResponseSchema } }, description: 'Modifié' },
+        404: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Non trouvé' }
+    }
+});
+
+export const deletePaymentMethodRoute = createRoute({
+    method: 'delete',
+    path: '/{id}',
+    tags: ['Moyens de Paiement'],
+    security: [{ Bearer: [] }],
+    request: { params: z.object({ id: z.string() }) },
+    responses: {
+        200: { content: { 'application/json': { schema: z.object({ success: z.boolean() }) } }, description: 'Supprimé' },
+        404: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Non trouvé' }
     }
 });

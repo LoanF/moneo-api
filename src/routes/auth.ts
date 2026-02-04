@@ -4,16 +4,17 @@ import { OAuth2Client } from 'google-auth-library';
 import {Transaction, UniqueConstraintError} from 'sequelize';
 import sequelize from '../config/database.js';
 import User from '../models/User.js';
-import {googleRoute, loginRoute, refreshRoute, registerRoute, updateProfileRoute, uploadAvatarRoute} from '../definitions/auth.definitions.js';
+import {googleRoute, loginRoute, logoutRoute, meRoute, refreshRoute, registerRoute, updateProfileRoute, uploadAvatarRoute} from '../definitions/auth.definitions.js';
 import {PutObjectCommand, S3Client} from "@aws-sdk/client-s3";
 import {verifyPassword} from "../utils/password.js";
+import {seedUserCategories} from "../utils/seeder.js";
 
 const auth = new OpenAPIHono();
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const s3 = new S3Client({
     region: "auto",
-    endpoint: process.env.R2_PUBLIC_URL,
+    endpoint: `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com`,
     credentials: {
         accessKeyId: process.env.R2_ACCESS_KEY_ID!,
         secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
@@ -67,6 +68,8 @@ auth.openapi(registerRoute, async (c) => {
             password: body.password
         }, { transaction });
 
+        await seedUserCategories(user.id);
+
         const response = await authSuccessResponse(c, user, body.fcmToken, 201, transaction);
         await transaction.commit();
         return response;
@@ -108,6 +111,10 @@ auth.openapi(googleRoute, async (c) => {
             }
         });
 
+        if (created) {
+            await seedUserCategories(user.id);
+        }
+
         if (!created && !user.googleId) {
             user.googleId = sub;
             if (!user.photoUrl && picture) user.photoUrl = picture;
@@ -141,14 +148,30 @@ auth.openapi(refreshRoute, async (c) => {
 });
 
 auth.openapi(updateProfileRoute, async (c) => {
-    const userPayload = c.get('jwtPayload');
+    const payload = c.get('jwtPayload');
     const body = c.req.valid('json');
 
-    await User.update(body, {
-        where: { id: userPayload.id }
-    });
+    try {
+        const user = await User.findByPk(payload.id);
 
-    return c.json({ success: true }, 200);
+        if (!user) {
+            return c.json({ error: "Utilisateur non trouvé" }, 404);
+        }
+
+        await user.update(body);
+
+        return c.json({
+            uid: String(user.id),
+            displayName: user.username,
+            email: user.email,
+            photoUrl: user.photoUrl,
+            fcmToken: user.fcmToken,
+            hasCompletedSetup: user.hasCompletedSetup
+        }, 200);
+
+    } catch (error: any) {
+        return c.json({ error: error.message || "Erreur lors de la mise à jour" }, 400);
+    }
 });
 
 auth.openapi(uploadAvatarRoute, async (c) => {
@@ -176,6 +199,34 @@ auth.openapi(uploadAvatarRoute, async (c) => {
         await user.save();
     }
     return c.json({ url: publicUrl }, 200);
+});
+
+auth.openapi(meRoute, async (c) => {
+    const payload = c.get('jwtPayload');
+    const user = await User.findByPk(payload.id);
+
+    if (!user) return c.json({ error: "Utilisateur non trouvé" }, 401);
+
+    return c.json({
+        uid: String(user.id),
+        displayName: user.username,
+        email: user.email,
+        photoUrl: user.photoUrl,
+        fcmToken: user.fcmToken,
+        hasCompletedSetup: user.hasCompletedSetup
+    }, 200);
+});
+
+auth.openapi(logoutRoute, async (c) => {
+    const payload = c.get('jwtPayload');
+
+    // On invalide le refresh token en base de données
+    await User.update(
+        { refreshToken: null },
+        { where: { id: payload.id } }
+    );
+
+    return c.json({ success: true }, 200);
 });
 
 export default auth;

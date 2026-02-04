@@ -1,5 +1,5 @@
 import {createRoute, z} from '@hono/zod-openapi';
-import {BankAccountResponseSchema, CreateBankAccountSchema, UpdateBankAccountSchema} from "../schemas/bankAccountResponseSchema.js";
+import {BankAccountResponseSchema, CreateBankAccountSchema, UpdateBankAccountSchema} from "../schemas/bankAccount.schema.js";
 import {ErrorSchema} from "../schemas/auth.schema.js";
 
 export const listBankAccountsRoute = createRoute({

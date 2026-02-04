@@ -17,7 +17,3 @@ export const CreateBankAccountSchema = z.object({
 }).openapi('CreateAccountInput');
 
 export const UpdateBankAccountSchema = CreateBankAccountSchema.partial().openapi('UpdateBankAccountInput');
-
-export const ErrorSchema = z.object({
-    error: z.string()
-}).openapi('ErrorResponse');

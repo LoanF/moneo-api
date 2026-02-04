@@ -27,6 +27,22 @@ export const RefreshSchema = z.object({
     token: z.string()
 }).openapi('RefreshInput');
 
+export const UserSchema = z.object({
+    uid: z.string(),
+    displayName: z.string(),
+    email: z.string(),
+    photoUrl: z.string().nullable(),
+    fcmToken: z.string().nullable(),
+    hasCompletedSetup: z.boolean(),
+}).openapi('User');
+
+export const UpdateProfileSchema = z.object({
+    username: z.string().min(3).optional(),
+    photoUrl: z.string().url().optional(),
+    hasCompletedSetup: z.boolean().optional(),
+    fcmToken: z.string().optional(),
+}).openapi('UpdateProfileInput');
+
 export const AuthResponseSchema = z.object({
     accessToken: z.string(),
     refreshToken: z.string(),

@@ -19,3 +19,5 @@ export const CreateMonthlyPaymentSchema = z.object({
     dayOfMonth: z.number().min(1).max(31),
     type: z.enum(['income', 'expense']),
 }).openapi('CreateMonthlyPaymentInput');
+
+export const UpdateMonthlyPaymentSchema = CreateMonthlyPaymentSchema.partial().openapi('UpdateMonthlyPaymentInput');

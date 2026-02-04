@@ -11,3 +11,5 @@ export const CreatePaymentMethodSchema = z.object({
     name: z.string().min(1, "Le nom est requis"),
     type: z.enum(['credit', 'debit']).default('debit')
 }).openapi('CreatePaymentMethodInput');
+
+export const UpdatePaymentMethodSchema = CreatePaymentMethodSchema.partial().openapi('UpdatePaymentMethodInput');
