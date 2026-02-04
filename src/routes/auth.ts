@@ -21,7 +21,7 @@ const s3 = new S3Client({
 });
 
 const generateTokens = async (userId: number, email: string): Promise<{ accessToken: string; refreshToken: string }> => {
-    const payload = { id: userId, email, exp: Math.floor(Date.now() / 1000) + 60 * 15 }; // 15 min
+    const payload = { id: userId, email, exp: Math.floor(Date.now() / 1000) + 60 * 5 }; // 5 min
     const refreshPayload = { id: userId, exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7 }; // 7 jours
 
     const [accessToken, refreshToken] = await Promise.all([
