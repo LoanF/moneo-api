@@ -5,7 +5,7 @@ import { OAuth2Client } from 'google-auth-library';
 import {Transaction, UniqueConstraintError} from 'sequelize';
 import sequelize from '../config/database.js';
 import User from '../models/User.js';
-import { googleRoute, loginRoute, refreshRoute, registerRoute } from './auth.definitions.js';
+import { googleRoute, loginRoute, refreshRoute, registerRoute } from '../definitions/auth.definitions.js';
 
 const auth = new OpenAPIHono();
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);

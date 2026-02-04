@@ -1,7 +1,7 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
 import BankAccount from '../models/BankAccount.js';
 import { authMiddleware } from '../middleware/auth.js';
-import {createAccountRoute, listAccountsRoute} from "./account.definitions.js";
+import {createAccountRoute, listAccountsRoute} from "../definitions/account.definitions.js";
 
 const accounts = new OpenAPIHono();
 
