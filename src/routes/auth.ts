@@ -1,17 +1,27 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
 import { sign, verify } from 'hono/jwt';
-import bcrypt from 'bcryptjs';
 import { OAuth2Client } from 'google-auth-library';
 import {Transaction, UniqueConstraintError} from 'sequelize';
 import sequelize from '../config/database.js';
 import User from '../models/User.js';
-import { googleRoute, loginRoute, refreshRoute, registerRoute } from '../definitions/auth.definitions.js';
+import {googleRoute, loginRoute, refreshRoute, registerRoute, updateProfileRoute, uploadAvatarRoute} from '../definitions/auth.definitions.js';
+import {PutObjectCommand, S3Client} from "@aws-sdk/client-s3";
+import {verifyPassword} from "../utils/password.js";
 
 const auth = new OpenAPIHono();
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
+const s3 = new S3Client({
+    region: "auto",
+    endpoint: process.env.R2_PUBLIC_URL,
+    credentials: {
+        accessKeyId: process.env.R2_ACCESS_KEY_ID!,
+        secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
+    },
+});
+
 const generateTokens = async (userId: number, email: string): Promise<{ accessToken: string; refreshToken: string }> => {
-    const payload = { id: userId, email, exp: Math.floor(Date.now() / 1000) + 60 * 15 }; // 15 min
+    const payload = { id: userId, email, exp: Math.floor(Date.now() / 1000) + 60 * 5 }; // 5 min
     const refreshPayload = { id: userId, exp: Math.floor(Date.now() / 1000) + 60 * 60 * 24 * 7 }; // 7 jours
 
     const [accessToken, refreshToken] = await Promise.all([
@@ -50,12 +60,11 @@ auth.openapi(registerRoute, async (c) => {
     const transaction = await sequelize.transaction();
     try {
         const body = c.req.valid('json');
-        const hashedPassword = await bcrypt.hash(body.password, 10);
 
         const user = await User.create({
             username: body.username,
             email: body.email.toLowerCase(),
-            password: hashedPassword
+            password: body.password
         }, { transaction });
 
         const response = await authSuccessResponse(c, user, body.fcmToken, 201, transaction);
@@ -70,12 +79,13 @@ auth.openapi(registerRoute, async (c) => {
 
 auth.openapi(loginRoute, async (c) => {
     const { email, password, fcmToken } = c.req.valid('json');
-    const user = await User.findOne({ where: { email: email.toLowerCase() } });
+    const user = await User.findOne({ where: { email } });
 
-    if (user && user.password && await bcrypt.compare(password, user.password)) {
-        return authSuccessResponse(c, user, fcmToken, 200);
+    if (!user || !user.password || !(await verifyPassword(password, user.password))) {
+        return c.json({ error: "Identifiants invalides" }, 401);
     }
-    return c.json({ error: "Identifiants incorrects" }, 401);
+
+    return authSuccessResponse(c, user, fcmToken, 200);
 });
 
 auth.openapi(googleRoute, async (c) => {
@@ -128,6 +138,44 @@ auth.openapi(refreshRoute, async (c) => {
     await user.save();
 
     return c.json(tokens, 200);
+});
+
+auth.openapi(updateProfileRoute, async (c) => {
+    const userPayload = c.get('jwtPayload');
+    const body = c.req.valid('json');
+
+    await User.update(body, {
+        where: { id: userPayload.id }
+    });
+
+    return c.json({ success: true }, 200);
+});
+
+auth.openapi(uploadAvatarRoute, async (c) => {
+    const userPayload = c.get('jwtPayload');
+    const body = await c.req.parseBody();
+    const file = body['avatar'] as File;
+
+    if (!file) return c.json({ error: "Aucun fichier fourni" }, 400);
+
+    const fileName = `avatars/${userPayload.id}-${Date.now()}-${file.name}`;
+    const fileBuffer = await file.arrayBuffer();
+
+    await s3.send(new PutObjectCommand({
+        Bucket: process.env.R2_BUCKET_NAME,
+        Key: fileName,
+        Body: Buffer.from(fileBuffer),
+        ContentType: file.type,
+    }));
+
+    const publicUrl = `${process.env.R2_PUBLIC_URL}/${fileName}`;
+
+    const user = await User.findByPk(userPayload.id);
+    if (user) {
+        user.photoUrl = publicUrl;
+        await user.save();
+    }
+    return c.json({ url: publicUrl }, 200);
 });
 
 export default auth;
