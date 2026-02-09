@@ -38,7 +38,7 @@ accounts.openapi(updateBankAccountRoute, async (c) => {
 
     try {
         const account = await BankAccount.findOne({
-            where: { id: Number(id), userId: user.id }
+            where: { id, userId: user.id }
         });
 
         if (!account) {
@@ -61,7 +61,7 @@ accounts.openapi(deleteBankAccountRoute, async (c) => {
 
     try {
         const account = await BankAccount.findOne({
-            where: { id: Number(id), userId: user.id },
+            where: { id, userId: user.id },
             transaction: t
         });
 

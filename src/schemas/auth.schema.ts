@@ -2,7 +2,7 @@ import {z} from "@hono/zod-openapi";
 
 export const RegisterSchema = z.object({
     username: z.string().min(3, "Le nom d'utilisateur doit contenir au moins 3 caractères"),
-    email: z.string().email("Format d'email invalide"),
+    email: z.email("Format d'email invalide"),
     password: z.string()
         .min(8, "Le mot de passe doit contenir au moins 8 caractères")
         .regex(/[A-Z]/, "Il faut au moins une majuscule")
@@ -13,7 +13,7 @@ export const RegisterSchema = z.object({
 }).openapi('RegisterInput');
 
 export const LoginSchema = z.object({
-    email: z.string().email(),
+    email: z.email(),
     password: z.string(),
     fcmToken: z.string().optional()
 }).openapi('LoginInput');
@@ -28,7 +28,7 @@ export const RefreshSchema = z.object({
 }).openapi('RefreshInput');
 
 export const UserSchema = z.object({
-    uid: z.string(),
+    uid: z.uuid(),
     displayName: z.string(),
     email: z.string(),
     photoUrl: z.string().nullable(),
@@ -38,7 +38,7 @@ export const UserSchema = z.object({
 
 export const UpdateProfileSchema = z.object({
     username: z.string().min(3).optional(),
-    photoUrl: z.string().url().optional(),
+    photoUrl: z.url().optional(),
     hasCompletedSetup: z.boolean().optional(),
     fcmToken: z.string().optional(),
 }).openapi('UpdateProfileInput');
@@ -47,7 +47,7 @@ export const AuthResponseSchema = z.object({
     accessToken: z.string(),
     refreshToken: z.string(),
     user: z.object({
-        uid: z.string(),
+        uid: z.uuid(),
         displayName: z.string(),
         email: z.string(),
         photoUrl: z.string().nullable(),

@@ -1,7 +1,7 @@
 import { z } from "@hono/zod-openapi";
 
 export const TransactionResponseSchema = z.object({
-    id: z.number(),
+    id: z.uuid(),
     amount: z.number(),
     type: z.enum(['income', 'expense', 'transfer']),
     date: z.string(),
@@ -24,10 +24,10 @@ export const CreateTransactionSchema = z.object({
 }).openapi('CreateTransactionInput');
 
 export const CreateTransferSchema = z.object({
-    fromAccountId: z.number(),
-    toAccountId: z.number(),
+    fromAccountId: z.uuid(),
+    toAccountId: z.uuid(),
     amount: z.number().positive("Le montant doit être supérieur à 0"),
-    categoryId: z.number().optional().nullable(),
+    categoryId: z.uuid().optional().nullable(),
     date: z.coerce.date().optional(),
     note: z.string().optional()
 }).openapi('CreateTransferInput');

@@ -1,7 +1,7 @@
 import { z } from "@hono/zod-openapi";
 
 export const CategoryStatSchema = z.object({
-    categoryId: z.number().nullable(),
+    categoryId: z.uuid().nullable(),
     categoryName: z.string(),
     iconCode: z.number().nullable(),
     colorValue: z.number().nullable(),

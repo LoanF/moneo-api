@@ -3,8 +3,8 @@ import sequelize from '../config/database.js';
 import User from './User.js';
 
 interface BankAccountAttributes {
-    id: number;
-    userId: number;
+    id: string;
+    userId: string;
     name: string;
     type: string;
     balance: number;
@@ -14,8 +14,8 @@ interface BankAccountAttributes {
 interface BankAccountCreationAttributes extends Optional<BankAccountAttributes, 'id' | 'balance' | 'currency'> {}
 
 class BankAccount extends Model<BankAccountAttributes, BankAccountCreationAttributes> implements BankAccountAttributes {
-    public id!: number;
-    public userId!: number;
+    public id!: string;
+    public userId!: string;
     public name!: string;
     public type!: string;
     public balance!: number;
@@ -23,11 +23,11 @@ class BankAccount extends Model<BankAccountAttributes, BankAccountCreationAttrib
 }
 
 BankAccount.init({
-    id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
     userId: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.UUID,
         allowNull: false,
-        references: { model: User, key: 'id' }
+        references: { model: 'Users', key: 'id' }
     },
     name: { type: DataTypes.STRING, allowNull: false },
     type: { type: DataTypes.STRING, allowNull: false, defaultValue: 'checking' },

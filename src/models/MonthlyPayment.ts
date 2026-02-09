@@ -2,11 +2,11 @@ import { DataTypes, Model, type Optional } from 'sequelize';
 import sequelize from '../config/database.js';
 
 interface MonthlyPaymentAttributes {
-    id: number;
-    userId: number;
-    accountId: number;
-    categoryId: number | null;
-    paymentMethodId: number | null;
+    id: string;
+    userId: string;
+    accountId: string;
+    categoryId: string | null;
+    paymentMethodId: string | null;
     name: string;
     amount: number;
     type: 'income' | 'expense';
@@ -17,11 +17,11 @@ interface MonthlyPaymentAttributes {
 export interface MonthlyPaymentCreationAttributes extends Optional<MonthlyPaymentAttributes, 'id' | 'lastProcessed'> {}
 
 class MonthlyPayment extends Model<MonthlyPaymentAttributes, MonthlyPaymentCreationAttributes> implements MonthlyPaymentAttributes {
-    declare id: number;
-    declare userId: number;
-    declare accountId: number;
-    declare categoryId: number | null;
-    declare paymentMethodId: number | null;
+    declare id: string;
+    declare userId: string;
+    declare accountId: string;
+    declare categoryId: string | null;
+    declare paymentMethodId: string | null;
     declare name: string;
     declare amount: number;
     declare type: 'income' | 'expense';
@@ -30,11 +30,11 @@ class MonthlyPayment extends Model<MonthlyPaymentAttributes, MonthlyPaymentCreat
 }
 
 MonthlyPayment.init({
-    id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-    userId: { type: DataTypes.INTEGER, allowNull: false },
-    accountId: { type: DataTypes.INTEGER, allowNull: false },
-    categoryId: { type: DataTypes.INTEGER, allowNull: true },
-    paymentMethodId: { type: DataTypes.INTEGER, allowNull: true },
+    id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
+    userId: { type: DataTypes.UUID, allowNull: false },
+    accountId: { type: DataTypes.UUID, allowNull: false },
+    categoryId: { type: DataTypes.UUID, allowNull: true },
+    paymentMethodId: { type: DataTypes.UUID, allowNull: true },
     name: { type: DataTypes.STRING, allowNull: false },
     amount: { type: DataTypes.DECIMAL(15, 2), allowNull: false },
     type: { type: DataTypes.ENUM('income', 'expense'), allowNull: false },

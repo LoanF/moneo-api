@@ -1,6 +1,6 @@
 import Category from '../models/Category.js';
 
-export const seedUserCategories = async (userId: number) => {
+export const seedUserCategories = async (userId: string) => {
     try {
         const parents = await Category.bulkCreate([
             // Dépenses

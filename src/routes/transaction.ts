@@ -16,7 +16,7 @@ transactions.openapi(listTransactionsRoute, async (c) => {
     const { limit, offset, accountId } = c.req.valid('query');
 
     const whereClause: any = { userId: user.id };
-    if (accountId) whereClause.accountId = Number(accountId);
+    if (accountId) whereClause.accountId = accountId;
 
     const { rows, count } = await Transaction.findAndCountAll({
         where: whereClause,
@@ -66,7 +66,7 @@ transactions.openapi(deleteTransactionRoute, async (c) => {
 
     try {
         const transaction = await Transaction.findOne({
-            where: { id: Number(id), userId: user.id },
+            where: { id, userId: user.id },
             transaction: t
         });
 
@@ -169,7 +169,7 @@ transactions.openapi(getStatsRoute, async (c) => {
         type: { [Op.ne]: 'transfer' }
     };
 
-    if (accountId) whereClause.accountId = Number(accountId);
+    if (accountId) whereClause.accountId = accountId;
 
     const totals = await Transaction.findAll({
         where: whereClause,
@@ -232,7 +232,7 @@ transactions.openapi(updateTransactionRoute, async (c) => {
 
     try {
         const transaction = await Transaction.findOne({
-            where: { id: Number(id), userId: user.id },
+            where: { id, userId: user.id },
             transaction: t
         });
 

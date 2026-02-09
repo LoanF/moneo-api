@@ -1,8 +1,8 @@
 import { z } from "@hono/zod-openapi";
 
 export const BankAccountResponseSchema = z.object({
-    id: z.number(),
-    userId: z.number(),
+    id: z.uuid(),
+    userId: z.uuid(),
     name: z.string().min(1, "Le nom est requis"),
     type: z.string(),
     balance: z.number(),
