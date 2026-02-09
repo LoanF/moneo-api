@@ -24,10 +24,8 @@ export const createPaymentMethodRoute = createRoute({
     security: [{ Bearer: [] }],
     request: { body: { content: { 'application/json': { schema: CreatePaymentMethodSchema } } } },
     responses: {
-        201: {
-            content: { 'application/json': { schema: PaymentMethodResponseSchema } },
-            description: 'Moyen de paiement créé'
-        },
+        201: { content: { 'application/json': { schema: PaymentMethodResponseSchema } }, description: 'Créé' },
+        200: { content: { 'application/json': { schema: PaymentMethodResponseSchema } }, description: 'Déjà existant' },
         400: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Erreur' }
     }
 });

@@ -5,11 +5,11 @@ import BankAccount from './BankAccount.js';
 import Category from './Category.js';
 
 interface TransactionAttributes {
-    id: number;
-    userId: number;
-    accountId: number;
-    categoryId: number | null;
-    paymentMethodId: number | null;
+    id: string;
+    userId: string;
+    accountId: string;
+    categoryId: string | null;
+    paymentMethodId: string | null;
     amount: number;
     date: Date;
     note: string | null;
@@ -20,11 +20,11 @@ interface TransactionAttributes {
 export interface TransactionCreationAttributes extends Optional<TransactionAttributes, 'id' | 'isChecked' | 'note'> {}
 
 class Transaction extends Model<TransactionAttributes, TransactionCreationAttributes> implements TransactionAttributes {
-    declare id: number;
-    declare userId: number;
-    declare accountId: number;
-    declare categoryId: number | null;
-    declare paymentMethodId: number | null;
+    declare id: string;
+    declare userId: string;
+    declare accountId: string;
+    declare categoryId: string | null;
+    declare paymentMethodId: string | null;
     declare amount: number;
     declare date: Date;
     declare note: string | null;
@@ -33,11 +33,11 @@ class Transaction extends Model<TransactionAttributes, TransactionCreationAttrib
 }
 
 Transaction.init({
-    id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-    userId: { type: DataTypes.INTEGER, allowNull: false, references: { model: 'Users', key: 'id' } },
-    accountId: { type: DataTypes.INTEGER, allowNull: false, references: { model: 'BankAccounts', key: 'id' } },
-    categoryId: { type: DataTypes.INTEGER, allowNull: true, references: { model: 'Categories', key: 'id' } },
-    paymentMethodId: { type: DataTypes.INTEGER, allowNull: true, references: { model: 'PaymentMethods', key: 'id' } },
+    id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
+    userId: { type: DataTypes.UUID, allowNull: false, references: { model: 'Users', key: 'id' } },
+    accountId: { type: DataTypes.UUID, allowNull: false, references: { model: 'BankAccounts', key: 'id' } },
+    categoryId: { type: DataTypes.UUID, allowNull: true, references: { model: 'Categories', key: 'id' } },
+    paymentMethodId: { type: DataTypes.UUID, allowNull: true, references: { model: 'PaymentMethods', key: 'id' } },
     amount: { type: DataTypes.DECIMAL(15, 2), allowNull: false },
     date: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW },
     note: { type: DataTypes.STRING, allowNull: true },

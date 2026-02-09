@@ -3,37 +3,37 @@ import sequelize from '../config/database.js';
 import User from './User.js';
 
 interface CategoryAttributes {
-    id: number;
+    id: string;
     name: string;
     iconCode: number;
     colorValue: number;
-    parentId: number | null;
-    userId: number;
+    parentId: string | null;
+    userId: string;
 }
 
 export interface CategoryCreationAttributes extends Optional<CategoryAttributes, 'id' | 'parentId'> {}
 
 class Category extends Model<CategoryAttributes, CategoryCreationAttributes> implements CategoryAttributes {
-    declare id: number;
+    declare id: string;
     declare name: string;
     declare iconCode: number;
     declare colorValue: number;
-    declare parentId: number | null;
-    declare userId: number;
+    declare parentId: string | null;
+    declare userId: string;
 }
 
 Category.init({
-    id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
     name: { type: DataTypes.STRING, allowNull: false },
     iconCode: { type: DataTypes.INTEGER, allowNull: false },
     colorValue: { type: DataTypes.BIGINT, allowNull: false },
     parentId: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.UUID,
         allowNull: true,
         references: { model: 'Categories', key: 'id' }
     },
     userId: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.UUID,
         allowNull: false,
         references: { model: 'Users', key: 'id' }
     },

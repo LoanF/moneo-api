@@ -3,7 +3,7 @@ import sequelize from '../config/database.js';
 import {hashPassword} from "../utils/password.js";
 
 interface UserAttributes {
-    id: number;
+    id: string;
     username: string;
     email: string;
     password?: string;
@@ -17,7 +17,7 @@ interface UserAttributes {
 interface UserCreationAttributes extends Optional<UserAttributes, 'id' | 'hasCompletedSetup'> {}
 
 class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
-    declare id: number;
+    declare id: string;
     declare username: string;
     declare email: string;
     declare password?: string;
@@ -29,7 +29,7 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
 }
 
 User.init({
-    id: {type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true},
+    id: {type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true},
     username: {type: DataTypes.STRING, allowNull: false},
     email: {type: DataTypes.STRING, unique: true, allowNull: false},
     password: {type: DataTypes.STRING, allowNull: true},

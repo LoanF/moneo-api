@@ -40,6 +40,10 @@ export const createTransactionRoute = createRoute({
     request: {body: {content: {'application/json': {schema: CreateTransactionSchema}}}},
     responses: {
         201: {content: {'application/json': {schema: TransactionResponseSchema}}, description: 'Transaction créée et solde mis à jour'},
+        200: {
+            content: {'application/json': {schema: TransactionResponseSchema}},
+            description: 'Transaction déjà existante (Idempotence)'
+        },
         400: {content: {'application/json': {schema: ErrorSchema}}, description: 'Requête invalide ou erreur lors du traitement'},
         404: {content: {'application/json': {schema: ErrorSchema}}, description: 'Compte bancaire associé non trouvé'}
     }

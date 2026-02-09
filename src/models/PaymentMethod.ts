@@ -3,23 +3,23 @@ import sequelize from '../config/database.js';
 import User from './User.js';
 
 interface PaymentMethodAttributes {
-    id: number;
+    id: string;
     name: string;
     type: 'credit' | 'debit';
-    userId: number;
+    userId: string;
 }
 
 export interface PaymentMethodCreationAttributes extends Optional<PaymentMethodAttributes, 'id'> {}
 
 class PaymentMethod extends Model<PaymentMethodAttributes, PaymentMethodCreationAttributes> implements PaymentMethodAttributes {
-    declare id: number;
+    declare id: string;
     declare name: string;
     declare type: 'credit' | 'debit';
-    declare userId: number;
+    declare userId: string;
 }
 
 PaymentMethod.init({
-    id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+    id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
     name: { type: DataTypes.STRING, allowNull: false },
     type: {
         type: DataTypes.ENUM('credit', 'debit'),
@@ -27,7 +27,7 @@ PaymentMethod.init({
         defaultValue: 'debit'
     },
     userId: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.UUID,
         allowNull: false,
         references: { model: 'Users', key: 'id' }
     },
