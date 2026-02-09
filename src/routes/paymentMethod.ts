@@ -18,11 +18,11 @@ paymentMethods.openapi(createPaymentMethodRoute, async (c) => {
     const body = c.req.valid('json');
 
     try {
-        const paymentMethod = await PaymentMethod.create({
-            ...body,
-            userId: user.id
+        const [method, created] = await PaymentMethod.findOrCreate({
+            where: { id: body.id },
+            defaults: { ...body, userId: user.id }
         });
-        return c.json(paymentMethod, 201);
+        return c.json(method, created ? 201 : 200);
     } catch (error: any) {
         return c.json({ error: error.message }, 400);
     }

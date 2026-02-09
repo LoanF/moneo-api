@@ -21,11 +21,15 @@ accounts.openapi(createBankAccountRoute, async (c) => {
     const body = c.req.valid('json');
 
     try {
-        const account = await BankAccount.create({
-            ...body,
-            userId: user.id
+        const [account, created] = await BankAccount.findOrCreate({
+            where: {id: body.id},
+            defaults: {
+                ...body,
+                userId: user.id
+            }
         });
-        return c.json(account, 201);
+
+        return c.json(account, created ? 201 : 200);
     } catch (error: any) {
         return c.json({ error: error.message }, 400);
     }

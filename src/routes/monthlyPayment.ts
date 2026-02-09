@@ -18,12 +18,12 @@ monthlyPayments.openapi(createMonthlyPaymentRoute, async (c) => {
     const body = c.req.valid('json');
 
     try {
-        const payment = await MonthlyPayment.create({
-            ...body,
-            userId: user.id
+        const [payment, created] = await MonthlyPayment.findOrCreate({
+            where: { id: body.id },
+            defaults: { ...body, userId: user.id }
         });
 
-        return c.json(payment, 201);
+        return c.json(payment, created ? 201 : 200);
     } catch (error: any) {
         return c.json({ error: error.message }, 400);
     }

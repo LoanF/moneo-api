@@ -24,10 +24,8 @@ export const createMonthlyPaymentRoute = createRoute({
     security: [{ Bearer: [] }],
     request: { body: { content: { 'application/json': { schema: CreateMonthlyPaymentSchema } } } },
     responses: {
-        201: {
-            content: { 'application/json': { schema: MonthlyPaymentResponseSchema } },
-            description: 'Créé'
-        },
+        201: { content: { 'application/json': { schema: MonthlyPaymentResponseSchema } }, description: 'Créé' },
+        200: { content: { 'application/json': { schema: MonthlyPaymentResponseSchema } }, description: 'Déjà existant' },
         400: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Erreur' }
     }
 });

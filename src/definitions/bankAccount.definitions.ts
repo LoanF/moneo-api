@@ -22,6 +22,7 @@ export const createBankAccountRoute = createRoute({
     request: { body: { content: { 'application/json': { schema: CreateBankAccountSchema } } } },
     responses: {
         201: { content: { 'application/json': { schema: BankAccountResponseSchema } }, description: 'Compte créé' },
+        200: { content: { 'application/json': { schema: BankAccountResponseSchema } }, description: 'Compte déjà existant' },
         400: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Erreur' }
     }
 });
@@ -45,6 +46,7 @@ export const updateBankAccountRoute = createRoute({
             content: { 'application/json': { schema: BankAccountResponseSchema } },
             description: 'Compte mis à jour avec succès'
         },
+
         400: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Erreur de validation' },
         404: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Compte non trouvé' }
     }
