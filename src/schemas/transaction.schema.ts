@@ -7,17 +7,17 @@ export const TransactionResponseSchema = z.object({
     date: z.string(),
     note: z.string().nullable(),
     isChecked: z.boolean(),
-    accountId: z.number(),
-    categoryId: z.number().nullable(),
-    paymentMethodId: z.number().nullable(),
+    accountId: z.uuid(),
+    categoryId: z.uuid().nullable(),
+    paymentMethodId: z.uuid().nullable(),
 }).openapi('TransactionResponse');
 
 export const CreateTransactionSchema = z.object({
     amount: z.number(),
     type: z.enum(['income', 'expense', 'transfer']),
-    accountId: z.number(),
-    categoryId: z.number().optional(),
-    paymentMethodId: z.number().optional(),
+    accountId: z.uuid(),
+    categoryId: z.uuid().optional(),
+    paymentMethodId: z.uuid().optional(),
     date: z.coerce.date().optional(),
     note: z.string().optional(),
     isChecked: z.boolean().optional().default(false)

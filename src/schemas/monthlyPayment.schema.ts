@@ -15,7 +15,7 @@ export const CreateMonthlyPaymentSchema = z.object({
     name: z.string().min(1),
     amount: z.number(),
     accountId: z.uuid(),
-    categoryId: z.number().optional().nullable(),
+    categoryId: z.uuid().optional().nullable(),
     dayOfMonth: z.number().min(1).max(31),
     type: z.enum(['income', 'expense']),
 }).openapi('CreateMonthlyPaymentInput');
