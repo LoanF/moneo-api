@@ -10,6 +10,7 @@ export const CategoryResponseSchema = z.object({
 }).openapi('CategoryResponse');
 
 export const CreateCategorySchema = z.object({
+    id: z.uuid(),
     name: z.string().min(1),
     iconCode: z.number(),
     colorValue: z.number(),

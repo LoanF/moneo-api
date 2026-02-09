@@ -10,6 +10,7 @@ export const BankAccountResponseSchema = z.object({
 }).openapi('AccountResponse');
 
 export const CreateBankAccountSchema = z.object({
+    id: z.uuid(),
     name: z.string().min(1, "Nom du compte requis"),
     type: z.string().default('checking'),
     balance: z.number().default(0),

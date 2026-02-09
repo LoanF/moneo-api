@@ -36,7 +36,20 @@ transactions.openapi(createTransactionRoute, async (c) => {
     const t = await sequelize.transaction();
 
     try {
-        const transaction = await Transaction.create({ ...body, userId: user.id, date: body.date ? new Date(body.date) : new Date() }, { transaction: t });
+        const [transaction, created] = await Transaction.findOrCreate({
+            where: { id: body.id },
+            defaults: {
+                ...body,
+                userId: user.id,
+                date: body.date ? new Date(body.date) : new Date()
+            },
+            transaction: t
+        });
+
+        if (!created) {
+            await t.rollback();
+            return c.json(transaction, 200);
+        }
 
         // Mise à jour automatique du solde du compte
         const account = await BankAccount.findByPk(body.accountId, { transaction: t });
@@ -45,9 +58,7 @@ transactions.openapi(createTransactionRoute, async (c) => {
             return c.json({ error: "Compte introuvable" }, 404);
         }
 
-        const amountNum = Number(body.amount);
-        const adjustment = body.type === 'income' ? amountNum : -amountNum;
-
+        const adjustment = body.type === 'income' ? Number(body.amount) : -Number(body.amount);
         account.balance = Number(account.balance) + adjustment;
         await account.save({ transaction: t });
 

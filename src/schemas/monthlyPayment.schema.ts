@@ -12,6 +12,7 @@ export const MonthlyPaymentResponseSchema = z.object({
 }).openapi('CreateMonthlyPaymentInput');
 
 export const CreateMonthlyPaymentSchema = z.object({
+    id: z.uuid(),
     name: z.string().min(1),
     amount: z.number(),
     accountId: z.uuid(),

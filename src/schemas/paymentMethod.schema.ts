@@ -8,6 +8,7 @@ export const PaymentMethodResponseSchema = z.object({
 }).openapi('PaymentMethodResponse');
 
 export const CreatePaymentMethodSchema = z.object({
+    id: z.uuid(),
     name: z.string().min(1, "Le nom est requis"),
     type: z.enum(['credit', 'debit']).default('debit')
 }).openapi('CreatePaymentMethodInput');

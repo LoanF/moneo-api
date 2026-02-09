@@ -13,6 +13,7 @@ export const TransactionResponseSchema = z.object({
 }).openapi('TransactionResponse');
 
 export const CreateTransactionSchema = z.object({
+    id: z.uuid(),
     amount: z.number(),
     type: z.enum(['income', 'expense', 'transfer']),
     accountId: z.uuid(),
