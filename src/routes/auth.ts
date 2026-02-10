@@ -156,8 +156,6 @@ protectedAuth.openapi(updateProfileRoute, async (c) => {
         const body = c.req.valid('json');
 
         try {
-
-            console.log(userPayload);
             const user = await User.findByPk(userPayload.id);
 
             if (!user) {
