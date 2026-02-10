@@ -29,7 +29,6 @@ export const googleRoute = createRoute({
     method: 'post',
     path: '/google',
     tags: ['Authentification'],
-    // security: [{ Bearer: [] }],
     summary: "Authentification Google",
     request: { body: { content: { 'application/json': { schema: GoogleSchema } } } },
     responses: {
@@ -120,7 +119,7 @@ export const meRoute = createRoute({
 export const logoutRoute = createRoute({
     method: 'post',
     path: '/logout',
-    summary: 'Déconnexion (Révocation du refresh token)',
+    summary: 'Déconnexion',
     tags: ['Authentification'],
     security: [{ Bearer: [] }],
     responses: {

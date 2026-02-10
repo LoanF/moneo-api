@@ -34,7 +34,7 @@ class Transaction extends Model<TransactionAttributes, TransactionCreationAttrib
 
 Transaction.init({
     id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
-    userId: { type: DataTypes.UUID, allowNull: false, references: { model: 'Users', key: 'id' } },
+    userId: { type: DataTypes.UUID, allowNull: false, references: { model: 'Users', key: 'uid' } },
     accountId: { type: DataTypes.UUID, allowNull: false, references: { model: 'BankAccounts', key: 'id' } },
     categoryId: { type: DataTypes.UUID, allowNull: true, references: { model: 'Categories', key: 'id' } },
     paymentMethodId: { type: DataTypes.UUID, allowNull: true, references: { model: 'PaymentMethods', key: 'id' } },

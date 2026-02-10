@@ -29,7 +29,7 @@ PaymentMethod.init({
     userId: {
         type: DataTypes.UUID,
         allowNull: false,
-        references: { model: 'Users', key: 'id' }
+        references: { model: 'Users', key: 'uid' }
     },
 }, { sequelize, modelName: 'PaymentMethod' });
 

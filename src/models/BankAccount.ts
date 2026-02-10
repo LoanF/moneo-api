@@ -27,7 +27,7 @@ BankAccount.init({
     userId: {
         type: DataTypes.UUID,
         allowNull: false,
-        references: { model: 'Users', key: 'id' }
+        references: { model: 'Users', key: 'uid' }
     },
     name: { type: DataTypes.STRING, allowNull: false },
     type: { type: DataTypes.STRING, allowNull: false, defaultValue: 'checking' },

@@ -31,7 +31,7 @@ export const updateBankAccountRoute = createRoute({
     method: 'patch',
     path: '/{id}',
     summary: 'Modifier un compte bancaire',
-    tags: ['Accounts'],
+    tags: ['Comptes'],
     security: [{ Bearer: [] }],
     request: {
         params: z.object({
@@ -56,7 +56,7 @@ export const deleteBankAccountRoute = createRoute({
     method: 'delete',
     path: '/{id}',
     summary: 'Supprimer un compte et ses données liées',
-    tags: ['Accounts'],
+    tags: ['Comptes'],
     security: [{ Bearer: [] }],
     request: {
         params: z.object({

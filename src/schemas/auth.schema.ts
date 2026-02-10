@@ -41,6 +41,9 @@ export const UpdateProfileSchema = z.object({
     photoUrl: z.url().optional(),
     hasCompletedSetup: z.boolean().optional(),
     fcmToken: z.string().optional(),
+    id: z.string().optional(),
+    email: z.string().optional(),
+    payment_methods: z.array(z.any()).optional(),
 }).openapi('UpdateProfileInput');
 
 export const AuthResponseSchema = z.object({

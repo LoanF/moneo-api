@@ -46,7 +46,7 @@ app.use('*', cors({
 const v1 = new OpenAPIHono();
 
 v1.route('/auth', authRoutes);
-v1.route('/accounts', accountRoutes);
+v1.route('/bank-accounts', accountRoutes);
 v1.route('/categories', categoryRoutes);
 v1.route('/payment-methods', paymentMethodRoutes);
 v1.route('/monthly-payments', monthlyPaymentRoutes);
@@ -106,7 +106,19 @@ v1.doc('/openapi.json', {
     info: {
         title: 'Moneo API V1',
         version: pkg.version,
-        description: 'API Real-time avec Hono et Zod-OpenAPI',
+        description: `
+## Overview
+Moneo is a high-performance personal finance management API built with **Hono** and **Zod-OpenAPI**. It provides secure, type-safe endpoints to manage bank accounts, transactions, and budgets.
+
+## Key Features
+* **Real-time Synchronization**: Powered by SSE (Server-Sent Events) to keep client data in sync across all devices.
+* **Secure Authentication**: JWT-based security with support for classic email/password and Google OAuth.
+* **Type Safety**: Full Zod integration ensuring rigorous data validation for every request and response.
+* **Automated Operations**: Built-in support for processing monthly recurring payments.
+
+## Getting Started
+Most endpoints require a valid **Bearer Token** in the authorization header. You can obtain one by using the \`/auth/login\` or \`/auth/google\` endpoints.
+        `.trim(),
     },
     servers: [{url: `http://localhost:${port}/api/v1`, description: 'Serveur V1'}],
 });

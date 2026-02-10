@@ -31,7 +31,8 @@ export const updateCategorySchema = CreateCategorySchema.partial();
 export const updateCategoryRoute = createRoute({
     method: 'patch',
     path: '/{id}',
-    tags: ['Categories'],
+    summary: 'Modifier une catégorie',
+    tags: ['Catégories'],
     security: [{ Bearer: [] }],
     request: {
         params: z.object({ id: z.string() }),
@@ -46,7 +47,8 @@ export const updateCategoryRoute = createRoute({
 export const deleteCategoryRoute = createRoute({
     method: 'delete',
     path: '/{id}',
-    tags: ['Categories'],
+    summary: 'Supprimer une catégorie',
+    tags: ['Catégories'],
     security: [{ Bearer: [] }],
     request: { params: z.object({ id: z.string() }) },
     responses: {

@@ -33,6 +33,7 @@ export const createMonthlyPaymentRoute = createRoute({
 export const updateMonthlyPaymentRoute = createRoute({
     method: 'patch',
     path: '/{id}',
+    summary: "Modifier un paiement mensuel",
     tags: ['Paiements Mensuels'],
     security: [{ Bearer: [] }],
     request: {
@@ -48,6 +49,7 @@ export const updateMonthlyPaymentRoute = createRoute({
 export const deleteMonthlyPaymentRoute = createRoute({
     method: 'delete',
     path: '/{id}',
+    summary: "Supprimer un paiement mensuel",
     tags: ['Paiements Mensuels'],
     security: [{ Bearer: [] }],
     request: { params: z.object({ id: z.string() }) },

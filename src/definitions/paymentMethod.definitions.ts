@@ -34,6 +34,7 @@ export const createPaymentMethodRoute = createRoute({
 export const updatePaymentMethodRoute = createRoute({
     method: 'patch',
     path: '/{id}',
+    summary: 'Modifier un moyen de paiement',
     tags: ['Moyens de Paiement'],
     security: [{ Bearer: [] }],
     request: {
@@ -49,6 +50,7 @@ export const updatePaymentMethodRoute = createRoute({
 export const deletePaymentMethodRoute = createRoute({
     method: 'delete',
     path: '/{id}',
+    summary: 'Supprimer un moyen de paiement',
     tags: ['Moyens de Paiement'],
     security: [{ Bearer: [] }],
     request: { params: z.object({ id: z.string() }) },

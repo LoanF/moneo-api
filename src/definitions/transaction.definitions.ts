@@ -120,6 +120,7 @@ export const updateTransactionRoute = createRoute({
     method: 'patch',
     path: '/{id}',
     tags: ['Transactions'],
+    summary: 'Modifie une transaction',
     security: [{ Bearer: [] }],
     request: {
         params: z.object({ id: z.string() }),
