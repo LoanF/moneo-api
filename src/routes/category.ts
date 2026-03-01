@@ -2,6 +2,7 @@ import { OpenAPIHono } from '@hono/zod-openapi';
 import Category from '../models/Category.js';
 import { authMiddleware } from '../middleware/auth.js';
 import {createCategoryRoute, deleteCategoryRoute, listCategoriesRoute, updateCategoryRoute} from '../definitions/category.definitions.js';
+import { logger } from '../utils/logger.js';
 
 const categories = new OpenAPIHono();
 
@@ -23,8 +24,9 @@ categories.openapi(createCategoryRoute, async (c) => {
             userId: user.id
         });
         return c.json(category, 201);
-    } catch (error: any) {
-        return c.json({ error: error.message }, 400);
+    } catch (error) {
+        logger.error(error);
+        return c.json({ error: 'Une erreur interne est survenue' }, 500);
     }
 });
 

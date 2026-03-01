@@ -4,6 +4,7 @@ import MonthlyPayment from '../models/MonthlyPayment.js';
 import Transaction from '../models/Transaction.js';
 import BankAccount from '../models/BankAccount.js';
 import sequelize from '../config/database.js';
+import { logger } from '../utils/logger.js';
 
 export const processMonthlyPayments = async () => {
     const today = new Date();
@@ -50,10 +51,10 @@ export const processMonthlyPayments = async () => {
             await payment.save({ transaction: t });
 
             await t.commit();
-            console.log(`✅ Opération mensuelle traitée : ${payment.name} pour l'user ${payment.userId}`);
+            logger.info(`Opération mensuelle traitée : ${payment.name} pour l'user ${payment.userId}`);
         } catch (error) {
             await t.rollback();
-            console.error(`❌ Échec opération mensuelle ${payment.name}:`, error);
+            logger.error(error, `Échec opération mensuelle ${payment.name}`);
         }
     }
 };

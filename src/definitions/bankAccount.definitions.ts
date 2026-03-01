@@ -23,7 +23,8 @@ export const createBankAccountRoute = createRoute({
     responses: {
         201: { content: { 'application/json': { schema: BankAccountResponseSchema } }, description: 'Compte créé' },
         200: { content: { 'application/json': { schema: BankAccountResponseSchema } }, description: 'Compte déjà existant' },
-        400: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Erreur' }
+        400: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Erreur' },
+        500: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Erreur interne' }
     }
 });
 
@@ -48,7 +49,8 @@ export const updateBankAccountRoute = createRoute({
         },
 
         400: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Erreur de validation' },
-        404: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Compte non trouvé' }
+        404: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Compte non trouvé' },
+        500: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Erreur interne' }
     }
 });
 
@@ -69,6 +71,7 @@ export const deleteBankAccountRoute = createRoute({
             description: 'Compte et transactions supprimés'
         },
         404: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Compte non trouvé' },
-        400: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Erreur lors de la suppression' }
+        400: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Erreur lors de la suppression' },
+        500: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Erreur interne' }
     }
 });

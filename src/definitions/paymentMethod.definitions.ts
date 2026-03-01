@@ -26,7 +26,8 @@ export const createPaymentMethodRoute = createRoute({
     responses: {
         201: { content: { 'application/json': { schema: PaymentMethodResponseSchema } }, description: 'Créé' },
         200: { content: { 'application/json': { schema: PaymentMethodResponseSchema } }, description: 'Déjà existant' },
-        400: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Erreur' }
+        400: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Erreur' },
+        500: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Erreur interne' }
     }
 });
 

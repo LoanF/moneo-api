@@ -22,7 +22,8 @@ export const createCategoryRoute = createRoute({
     request: { body: { content: { 'application/json': { schema: CreateCategorySchema } } } },
     responses: {
         201: { content: { 'application/json': { schema: CategoryResponseSchema } }, description: 'Créé' },
-        400: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Erreur' }
+        400: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Erreur' },
+        500: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Erreur interne' }
     }
 });
 

@@ -9,10 +9,17 @@ import {PutObjectCommand, S3Client} from "@aws-sdk/client-s3";
 import {verifyPassword} from "../utils/password.js";
 import {seedUserCategories} from "../utils/seeder.js";
 import {authMiddleware} from "../middleware/auth.js";
+import {createRateLimiter} from "../middleware/rateLimiter.js";
+import {logger} from "../utils/logger.js";
 
 const auth = new OpenAPIHono();
 const protectedAuth = new OpenAPIHono();
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+auth.use('/register', createRateLimiter(5, 10 * 60 * 1000));
+auth.use('/login', createRateLimiter(5, 15 * 60 * 1000));
+auth.use('/google', createRateLimiter(10, 60 * 1000));
+auth.use('/refresh', createRateLimiter(10, 60 * 1000));
 
 protectedAuth.use('*', authMiddleware);
 
@@ -162,9 +169,7 @@ protectedAuth.openapi(updateProfileRoute, async (c) => {
                 return c.json({error: "Utilisateur non trouvé"}, 404);
             }
 
-            const {payment_methods, id, email, ...userData} = body;
-
-            await user.update(userData);
+            await user.update(body);
 
             return c.json({
                 uid: String(user.uid),
@@ -175,8 +180,9 @@ protectedAuth.openapi(updateProfileRoute, async (c) => {
                 hasCompletedSetup: user.hasCompletedSetup
             }, 200);
 
-        } catch (error: any) {
-            return c.json({error: error.message || "Erreur lors de la mise à jour"}, 400);
+        } catch (error) {
+            logger.error(error);
+            return c.json({error: 'Une erreur interne est survenue'}, 500);
         }
     });
 

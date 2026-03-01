@@ -6,6 +6,7 @@ import { authMiddleware } from '../middleware/auth.js';
 import {createTransactionRoute, listTransactionsRoute, deleteTransactionRoute, createTransferRoute, getStatsRoute, updateTransactionRoute} from '../definitions/transaction.definitions.js';
 import sequelize from '../config/database.js';
 import { Op, fn, col } from 'sequelize';
+import { logger } from '../utils/logger.js';
 
 const transactions = new OpenAPIHono();
 
@@ -64,9 +65,10 @@ transactions.openapi(createTransactionRoute, async (c) => {
 
         await t.commit();
         return c.json(transaction, 201);
-    } catch (error: any) {
+    } catch (error) {
         await t.rollback();
-        return c.json({ error: error.message }, 400);
+        logger.error(error);
+        return c.json({ error: 'Une erreur interne est survenue' }, 500);
     }
 });
 
@@ -101,9 +103,10 @@ transactions.openapi(deleteTransactionRoute, async (c) => {
         await t.commit();
         return c.json({ success: true }, 200);
 
-    } catch (error: any) {
+    } catch (error) {
         if (t) await t.rollback();
-        return c.json({ error: error.message }, 400);
+        logger.error(error);
+        return c.json({ error: 'Une erreur interne est survenue' }, 500);
     }
 });
 
@@ -161,9 +164,10 @@ transactions.openapi(createTransferRoute, async (c) => {
 
         return c.json({ fromTransaction, toTransaction }, 201);
 
-    } catch (error: any) {
+    } catch (error) {
         if (t) await t.rollback();
-        return c.json({ error: error.message }, 400);
+        logger.error(error);
+        return c.json({ error: 'Une erreur interne est survenue' }, 500);
     }
 });
 
@@ -273,9 +277,10 @@ transactions.openapi(updateTransactionRoute, async (c) => {
 
         return c.json(transaction, 200);
 
-    } catch (error: any) {
+    } catch (error) {
         if (t) await t.rollback();
-        return c.json({ error: error.message || "Erreur interne" }, 400);
+        logger.error(error);
+        return c.json({ error: 'Une erreur interne est survenue' }, 500);
     }
 });
 

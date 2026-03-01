@@ -2,6 +2,7 @@ import { OpenAPIHono } from '@hono/zod-openapi';
 import PaymentMethod from '../models/PaymentMethod.js';
 import { authMiddleware } from '../middleware/auth.js';
 import {createPaymentMethodRoute, deletePaymentMethodRoute, listPaymentMethodsRoute, updatePaymentMethodRoute} from '../definitions/paymentMethod.definitions.js';
+import { logger } from '../utils/logger.js';
 
 const paymentMethods = new OpenAPIHono();
 
@@ -23,8 +24,9 @@ paymentMethods.openapi(createPaymentMethodRoute, async (c) => {
             defaults: { ...body, userId: user.id }
         });
         return c.json(method, created ? 201 : 200);
-    } catch (error: any) {
-        return c.json({ error: error.message }, 400);
+    } catch (error) {
+        logger.error(error);
+        return c.json({ error: 'Une erreur interne est survenue' }, 500);
     }
 });
 

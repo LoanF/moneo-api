@@ -71,7 +71,8 @@ export const updateProfileRoute = createRoute({
             description: 'Profil mis à jour avec succès'
         },
         400: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Erreur' },
-        404: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Utilisateur non trouvé' }
+        404: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Utilisateur non trouvé' },
+        500: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Erreur interne' }
     }
 });
 

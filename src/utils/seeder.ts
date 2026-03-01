@@ -1,4 +1,5 @@
 import Category from '../models/Category.js';
+import { logger } from './logger.js';
 
 export const seedUserCategories = async (userId: string) => {
     try {
@@ -48,8 +49,8 @@ export const seedUserCategories = async (userId: string) => {
             await Category.bulkCreate(subCategories);
         }
 
-        console.log(`🌱 Arborescence de catégories initialisée pour l'utilisateur ${userId}`);
+        logger.info(`Arborescence de catégories initialisée pour l'utilisateur ${userId}`);
     } catch (error) {
-        console.error(`❌ Erreur lors du seeding pour l'utilisateur ${userId}:`, error);
+        logger.error(error, `Erreur lors du seeding pour l'utilisateur ${userId}`);
     }
 };

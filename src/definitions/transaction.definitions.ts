@@ -45,7 +45,8 @@ export const createTransactionRoute = createRoute({
             description: 'Transaction déjà existante (Idempotence)'
         },
         400: {content: {'application/json': {schema: ErrorSchema}}, description: 'Requête invalide ou erreur lors du traitement'},
-        404: {content: {'application/json': {schema: ErrorSchema}}, description: 'Compte bancaire associé non trouvé'}
+        404: {content: {'application/json': {schema: ErrorSchema}}, description: 'Compte bancaire associé non trouvé'},
+        500: {content: {'application/json': {schema: ErrorSchema}}, description: 'Erreur interne'}
     }
 });
 
@@ -67,7 +68,8 @@ export const deleteTransactionRoute = createRoute({
             description: 'Transaction supprimée et solde rectifié avec succès'
         },
         404: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Transaction introuvable' },
-        400: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Échec de la suppression' }
+        400: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Échec de la suppression' },
+        500: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Erreur interne' }
     }
 });
 
@@ -88,7 +90,8 @@ export const createTransferRoute = createRoute({
             description: 'Transfert réussi'
         },
         400: { content: {'application/json': {schema: ErrorSchema}}, description: 'Erreur' },
-        404: { content: {'application/json': {schema: ErrorSchema}}, description: 'Compte(s) introuvable(s)' }
+        404: { content: {'application/json': {schema: ErrorSchema}}, description: 'Compte(s) introuvable(s)' },
+        500: { content: {'application/json': {schema: ErrorSchema}}, description: 'Erreur interne' }
     }
 });
 
@@ -129,6 +132,7 @@ export const updateTransactionRoute = createRoute({
     responses: {
         200: { content: { 'application/json': { schema: TransactionResponseSchema } }, description: 'Transaction mise à jour' },
         400: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Erreur de validation ou solde insuffisant' },
-        404: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Non trouvée' }
+        404: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Non trouvée' },
+        500: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Erreur interne' }
     }
 });

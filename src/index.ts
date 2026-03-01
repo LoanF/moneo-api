@@ -1,7 +1,8 @@
 import {serve} from '@hono/node-server';
 import {OpenAPIHono} from '@hono/zod-openapi';
-import {logger} from 'hono/logger';
+import {logger as honoLogger} from 'hono/logger';
 import {cors} from 'hono/cors';
+import {logger} from './utils/logger.js';
 import {swaggerUI} from '@hono/swagger-ui';
 import {streamSSE} from 'hono/streaming';
 import {EventEmitter} from 'node:events';
@@ -33,9 +34,9 @@ eventBus.setMaxListeners(1000);
 
 const port = Number(process.env.PORT) || 3000;
 
-app.use('*', logger());
+app.use('*', honoLogger());
 app.use('*', cors({
-    origin: '*',
+    origin: (process.env.ALLOWED_ORIGINS || '*').split(','),
     allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowHeaders: ['Content-Type', 'Authorization'],
     exposeHeaders: ['Content-Length', 'X-Total-Count'],
@@ -166,10 +167,10 @@ const startServer = async () => {
 
         await processMonthlyPayments();
 
-        console.log(`🚀 Server running on port ${port} | Docs: http://localhost:${port}/api-docs`);
+        logger.info(`Server running on port ${port} | Docs: http://localhost:${port}/api-docs`);
         serve({fetch: app.fetch, port});
     } catch (error) {
-        console.error('❌ Database connection failed:', error);
+        logger.error(error, 'Database connection failed');
         process.exit(1);
     }
 };

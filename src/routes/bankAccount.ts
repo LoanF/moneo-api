@@ -5,6 +5,7 @@ import {createBankAccountRoute, deleteBankAccountRoute, listBankAccountsRoute, u
 import Transaction from '../models/Transaction.js';
 import MonthlyPayment from "../models/MonthlyPayment.js";
 import sequelize from "../config/database.js";
+import { logger } from '../utils/logger.js';
 
 const accounts = new OpenAPIHono();
 
@@ -30,8 +31,9 @@ accounts.openapi(createBankAccountRoute, async (c) => {
         });
 
         return c.json(account, created ? 201 : 200);
-    } catch (error: any) {
-        return c.json({ error: error.message }, 400);
+    } catch (error) {
+        logger.error(error);
+        return c.json({ error: 'Une erreur interne est survenue' }, 500);
     }
 });
 
@@ -53,8 +55,9 @@ accounts.openapi(updateBankAccountRoute, async (c) => {
 
         return c.json(account, 200);
 
-    } catch (error: any) {
-        return c.json({ error: error.message || "Erreur lors de la mise à jour" }, 400);
+    } catch (error) {
+        logger.error(error);
+        return c.json({ error: 'Une erreur interne est survenue' }, 500);
     }
 });
 
@@ -89,9 +92,10 @@ accounts.openapi(deleteBankAccountRoute, async (c) => {
 
         return c.json({ success: true }, 200);
 
-    } catch (error: any) {
+    } catch (error) {
         if (t) await t.rollback();
-        return c.json({ error: error.message || "Erreur lors de la suppression en cascade" }, 400);
+        logger.error(error);
+        return c.json({ error: 'Une erreur interne est survenue' }, 500);
     }
 });
 

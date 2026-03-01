@@ -2,6 +2,7 @@ import { OpenAPIHono } from '@hono/zod-openapi';
 import MonthlyPayment from '../models/MonthlyPayment.js';
 import { authMiddleware } from '../middleware/auth.js';
 import {createMonthlyPaymentRoute, deleteMonthlyPaymentRoute, listMonthlyPaymentsRoute, updateMonthlyPaymentRoute} from '../definitions/monthlyPayment.definitions.js';
+import { logger } from '../utils/logger.js';
 
 const monthlyPayments = new OpenAPIHono();
 
@@ -24,8 +25,9 @@ monthlyPayments.openapi(createMonthlyPaymentRoute, async (c) => {
         });
 
         return c.json(payment, created ? 201 : 200);
-    } catch (error: any) {
-        return c.json({ error: error.message }, 400);
+    } catch (error) {
+        logger.error(error);
+        return c.json({ error: 'Une erreur interne est survenue' }, 500);
     }
 });
 
