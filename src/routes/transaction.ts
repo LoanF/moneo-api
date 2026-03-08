@@ -59,7 +59,11 @@ transactions.openapi(createTransactionRoute, async (c) => {
             return c.json({ error: "Compte introuvable" }, 404);
         }
 
-        const adjustment = body.type === 'income' ? Number(body.amount) : -Number(body.amount);
+        // For transfers, amount is already signed (-X for source, +X for target)
+        // For income/expense, apply the conventional sign
+        const adjustment = body.type === 'transfer'
+            ? Number(body.amount)
+            : (body.type === 'income' ? Number(body.amount) : -Number(body.amount));
         account.balance = Number(account.balance) + adjustment;
         await account.save({ transaction: t });
 
@@ -92,7 +96,10 @@ transactions.openapi(deleteTransactionRoute, async (c) => {
 
         if (account) {
             const amountNum = Number(transaction.amount);
-            const reverseAdjustment = transaction.type === 'income' ? -amountNum : amountNum;
+            // Reverse the adjustment that was applied when the transaction was created
+            const reverseAdjustment = transaction.type === 'transfer'
+                ? -amountNum
+                : (transaction.type === 'income' ? -amountNum : amountNum);
 
             account.balance = Number(account.balance) + reverseAdjustment;
             await account.save({ transaction: t });
@@ -263,13 +270,17 @@ transactions.openapi(updateTransactionRoute, async (c) => {
         }
 
         const oldAmount = Number(transaction.amount);
-        const reverseAdjustment = transaction.type === 'income' ? -oldAmount : oldAmount;
+        const reverseAdjustment = transaction.type === 'transfer'
+            ? -oldAmount
+            : (transaction.type === 'income' ? -oldAmount : oldAmount);
         account.balance = Number(account.balance) + reverseAdjustment;
 
         await transaction.update(body, { transaction: t });
 
         const newAmount = Number(transaction.amount);
-        const newAdjustment = transaction.type === 'income' ? newAmount : -newAmount;
+        const newAdjustment = transaction.type === 'transfer'
+            ? newAmount
+            : (transaction.type === 'income' ? newAmount : -newAmount);
         account.balance = Number(account.balance) + newAdjustment;
 
         await account.save({ transaction: t });

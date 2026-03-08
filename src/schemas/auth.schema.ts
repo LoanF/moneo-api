@@ -29,7 +29,7 @@ export const RefreshSchema = z.object({
 
 export const UserSchema = z.object({
     uid: z.uuid(),
-    displayName: z.string(),
+    username: z.string(),
     email: z.string(),
     photoUrl: z.string().nullable(),
     fcmToken: z.string().nullable(),
@@ -48,7 +48,7 @@ export const AuthResponseSchema = z.object({
     refreshToken: z.string(),
     user: z.object({
         uid: z.uuid(),
-        displayName: z.string(),
+        username: z.string(),
         email: z.string(),
         photoUrl: z.string().nullable(),
         fcmToken: z.string().nullable(),

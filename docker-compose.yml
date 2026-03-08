@@ -10,20 +10,26 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - postgres-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     ports:
       - "5432:5432" # A RETIRER EN PROD
 
   api:
     build:
       context: .
-      target: builder
+      target: development
     container_name: moneo_api
-    command: npm run dev
+    command: pnpm run dev
     ports:
       - "3000:3000"
       - "9229:9229"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     env_file:
       - .env
     volumes:

@@ -59,7 +59,7 @@ const authSuccessResponse = async (c: any, user: User, fcmToken?: string, status
         ...tokens,
         user: {
             uid: String(user.uid),
-            displayName: user.username,
+            username: user.username,
             email: user.email,
             photoUrl: user.photoUrl || null,
             fcmToken: user.fcmToken || null,
@@ -173,7 +173,7 @@ protectedAuth.openapi(updateProfileRoute, async (c) => {
 
             return c.json({
                 uid: String(user.uid),
-                displayName: user.username,
+                username: user.username,
                 email: user.email,
                 photoUrl: user.photoUrl,
                 fcmToken: user.fcmToken,
@@ -221,7 +221,7 @@ protectedAuth.openapi(meRoute, async (c) => {
 
     return c.json({
         uid: String(user.uid),
-        displayName: user.username,
+        username: user.username,
         email: user.email,
         photoUrl: user.photoUrl,
         fcmToken: user.fcmToken,
