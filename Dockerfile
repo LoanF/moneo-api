@@ -1,7 +1,9 @@
 FROM node:20-alpine AS base
 WORKDIR /usr/src/app
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN npm config set strict-ssl false
+RUN npm install -g pnpm
 COPY package.json pnpm-lock.yaml ./
+RUN npm config set strict-ssl false
 RUN pnpm install
 
 FROM base AS development
@@ -15,7 +17,7 @@ RUN pnpm run build
 
 FROM node:20-alpine AS production
 WORKDIR /usr/src/app
-RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN npm install -g pnpm
 COPY --from=builder /usr/src/app/dist ./dist
 COPY --from=builder /usr/src/app/package.json /usr/src/app/pnpm-lock.yaml ./
 RUN pnpm install --prod --frozen-lockfile
