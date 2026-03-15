@@ -5,7 +5,7 @@ import User from './User.js';
 interface CategoryAttributes {
     id: string;
     name: string;
-    iconCode: number;
+    iconCode: string;
     colorValue: number;
     parentId: string | null;
     userId: string;
@@ -16,7 +16,7 @@ export interface CategoryCreationAttributes extends Optional<CategoryAttributes,
 class Category extends Model<CategoryAttributes, CategoryCreationAttributes> implements CategoryAttributes {
     declare id: string;
     declare name: string;
-    declare iconCode: number;
+    declare iconCode: string;
     declare colorValue: number;
     declare parentId: string | null;
     declare userId: string;
@@ -25,7 +25,7 @@ class Category extends Model<CategoryAttributes, CategoryCreationAttributes> imp
 Category.init({
     id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
     name: { type: DataTypes.STRING, allowNull: false },
-    iconCode: { type: DataTypes.INTEGER, allowNull: false },
+    iconCode: { type: DataTypes.STRING, allowNull: false },
     colorValue: { type: DataTypes.BIGINT, allowNull: false },
     parentId: {
         type: DataTypes.UUID,
