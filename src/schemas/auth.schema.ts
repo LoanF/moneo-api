@@ -38,7 +38,7 @@ export const UserSchema = z.object({
 
 export const UpdateProfileSchema = z.object({
     username: z.string().min(3).optional(),
-    photoUrl: z.url().optional(),
+    photoUrl: z.url().nullish(),
     hasCompletedSetup: z.boolean().optional(),
     fcmToken: z.string().optional(),
 }).openapi('UpdateProfileInput');

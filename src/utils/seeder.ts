@@ -1,7 +1,8 @@
+import { Transaction } from 'sequelize';
 import Category from '../models/Category.js';
 import { logger } from './logger.js';
 
-export const seedUserCategories = async (userId: string) => {
+export const seedUserCategories = async (userId: string, transaction?: Transaction) => {
     try {
         const parents = await Category.bulkCreate([
             // Dépenses
@@ -14,7 +15,7 @@ export const seedUserCategories = async (userId: string) => {
             // Revenus
             { name: 'Salaire', iconCode: 'work', colorValue: 0xFF3F51B5, userId },
             { name: 'Épargne', iconCode: 'savings', colorValue: 0xFFFFC107, userId },
-        ]);
+        ], { transaction });
 
         const alimentId = parents.find(c => c.name === 'Alimentation')?.id;
         const transportId = parents.find(c => c.name === 'Transport')?.id;
@@ -50,7 +51,7 @@ export const seedUserCategories = async (userId: string) => {
         }
 
         if (subCategories.length > 0) {
-            await Category.bulkCreate(subCategories);
+            await Category.bulkCreate(subCategories, { transaction });
         }
 
         logger.info(`Seed des catégories terminé avec succès pour ${userId}`);

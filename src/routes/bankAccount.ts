@@ -1,13 +1,14 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
 import BankAccount from '../models/BankAccount.js';
 import { authMiddleware } from '../middleware/auth.js';
+import type { AppEnv } from '../types.js';
 import {createBankAccountRoute, deleteBankAccountRoute, listBankAccountsRoute, updateBankAccountRoute} from "../definitions/bankAccount.definitions.js";
 import Transaction from '../models/Transaction.js';
 import MonthlyPayment from "../models/MonthlyPayment.js";
 import sequelize from "../config/database.js";
 import { logger } from '../utils/logger.js';
 
-const accounts = new OpenAPIHono();
+const accounts = new OpenAPIHono<AppEnv>();
 
 accounts.use('*', authMiddleware);
 

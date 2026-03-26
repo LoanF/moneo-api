@@ -3,7 +3,7 @@ import { z } from "@hono/zod-openapi";
 export const CategoryResponseSchema = z.object({
     id: z.uuid(),
     name: z.string(),
-    iconCode: z.number(),
+    iconCode: z.string(),
     colorValue: z.number(),
     parentId: z.uuid().nullable(),
     userId: z.uuid()
@@ -12,7 +12,7 @@ export const CategoryResponseSchema = z.object({
 export const CreateCategorySchema = z.object({
     id: z.uuid(),
     name: z.string().min(1),
-    iconCode: z.number(),
+    iconCode: z.string(),
     colorValue: z.number(),
     parentId: z.uuid().optional().nullable()
 }).openapi('CreateCategoryInput');
