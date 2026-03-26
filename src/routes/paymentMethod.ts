@@ -1,10 +1,11 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
 import PaymentMethod from '../models/PaymentMethod.js';
 import { authMiddleware } from '../middleware/auth.js';
+import type { AppEnv } from '../types.js';
 import {createPaymentMethodRoute, deletePaymentMethodRoute, listPaymentMethodsRoute, updatePaymentMethodRoute} from '../definitions/paymentMethod.definitions.js';
 import { logger } from '../utils/logger.js';
 
-const paymentMethods = new OpenAPIHono();
+const paymentMethods = new OpenAPIHono<AppEnv>();
 
 paymentMethods.use('*', authMiddleware);
 

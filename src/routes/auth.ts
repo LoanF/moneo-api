@@ -1,4 +1,5 @@
 import {OpenAPIHono} from '@hono/zod-openapi';
+import type { AppEnv } from '../types.js';
 import {sign, verify} from 'hono/jwt';
 import {OAuth2Client} from 'google-auth-library';
 import {Transaction, UniqueConstraintError} from 'sequelize';
@@ -12,8 +13,8 @@ import {authMiddleware} from "../middleware/auth.js";
 import {createRateLimiter} from "../middleware/rateLimiter.js";
 import {logger} from "../utils/logger.js";
 
-const auth = new OpenAPIHono();
-const protectedAuth = new OpenAPIHono();
+const auth = new OpenAPIHono<AppEnv>();
+const protectedAuth = new OpenAPIHono<AppEnv>();
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 auth.use('/register', createRateLimiter(5, 10 * 60 * 1000));
@@ -44,18 +45,12 @@ const generateTokens = async (userId: string, email: string): Promise<{ accessTo
     return {accessToken, refreshToken};
 };
 
-const authSuccessResponse = async (c: any, user: User, fcmToken?: string, status: 200 | 201 = 200, transaction?: Transaction) => {
+const buildAuthPayload = async (user: User, fcmToken?: string, transaction?: Transaction) => {
     const tokens = await generateTokens(user.uid, user.email);
-
     user.refreshToken = tokens.refreshToken;
-
-    if (fcmToken) {
-        user.fcmToken = fcmToken;
-    }
-
+    if (fcmToken) user.fcmToken = fcmToken;
     await user.save({transaction});
-
-    return c.json({
+    return {
         ...tokens,
         user: {
             uid: String(user.uid),
@@ -65,7 +60,7 @@ const authSuccessResponse = async (c: any, user: User, fcmToken?: string, status
             fcmToken: user.fcmToken || null,
             hasCompletedSetup: user.hasCompletedSetup
         }
-    }, status);
+    };
 };
 
 auth.openapi(registerRoute, async (c) => {
@@ -79,11 +74,11 @@ auth.openapi(registerRoute, async (c) => {
             password: body.password
         }, {transaction});
 
-        await seedUserCategories(user.uid);
+        await seedUserCategories(user.uid, transaction);
 
-        const response = await authSuccessResponse(c, user, body.fcmToken, 201, transaction);
+        const payload = await buildAuthPayload(user, body.fcmToken, transaction);
         await transaction.commit();
-        return response;
+        return c.json(payload, 201);
     } catch (error) {
         await transaction.rollback();
         const msg = error instanceof UniqueConstraintError ? "Email déjà utilisé" : "Erreur lors de l'inscription";
@@ -99,7 +94,7 @@ auth.openapi(loginRoute, async (c) => {
         return c.json({error: "Identifiants invalides"}, 401);
     }
 
-    return authSuccessResponse(c, user, fcmToken, 200);
+    return c.json(await buildAuthPayload(user, fcmToken), 200);
 });
 
 auth.openapi(googleRoute, async (c) => {
@@ -132,7 +127,7 @@ auth.openapi(googleRoute, async (c) => {
             if (!fcmToken) await user.save();
         }
 
-        return authSuccessResponse(c, user, fcmToken, 200);
+        return c.json(await buildAuthPayload(user, fcmToken), 200);
     } catch (error) {
         return c.json({error: "Authentification Google échouée"}, 403);
     }

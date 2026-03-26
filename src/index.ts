@@ -7,6 +7,7 @@ import {swaggerUI} from '@hono/swagger-ui';
 import {streamSSE} from 'hono/streaming';
 import {EventEmitter} from 'node:events';
 import sequelize from './config/database.js';
+import type { AppEnv } from './types.js';
 import {authMiddleware} from './middleware/auth.js';
 import {processMonthlyPayments} from './services/monthlyProcessor.js';
 
@@ -28,7 +29,7 @@ import './models/Transaction.js';
 
 import pkg from '../package.json' with {type: 'json'};
 
-const app = new OpenAPIHono();
+const app = new OpenAPIHono<AppEnv>();
 const eventBus = new EventEmitter();
 eventBus.setMaxListeners(1000);
 
@@ -44,7 +45,7 @@ app.use('*', cors({
 }));
 
 // --- CONFIGURATION V1 ---
-const v1 = new OpenAPIHono();
+const v1 = new OpenAPIHono<AppEnv>();
 
 v1.route('/auth', authRoutes);
 v1.route('/bank-accounts', accountRoutes);

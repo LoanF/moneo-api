@@ -1,4 +1,5 @@
 import { OpenAPIHono } from '@hono/zod-openapi';
+import type { AppEnv } from '../types.js';
 import Transaction from '../models/Transaction.js';
 import BankAccount from '../models/BankAccount.js';
 import Category from '../models/Category.js';
@@ -8,7 +9,7 @@ import sequelize from '../config/database.js';
 import { Op, fn, col } from 'sequelize';
 import { logger } from '../utils/logger.js';
 
-const transactions = new OpenAPIHono();
+const transactions = new OpenAPIHono<AppEnv>();
 
 transactions.use('*', authMiddleware);
 
