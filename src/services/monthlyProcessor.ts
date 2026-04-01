@@ -3,8 +3,10 @@ import { Op } from 'sequelize';
 import MonthlyPayment from '../models/MonthlyPayment.js';
 import Transaction from '../models/Transaction.js';
 import BankAccount from '../models/BankAccount.js';
+import User from '../models/User.js';
 import sequelize from '../config/database.js';
 import { logger } from '../utils/logger.js';
+import { sendPushNotification } from './fcmService.js';
 
 export const processMonthlyPayments = async () => {
     const today = new Date();
@@ -52,6 +54,17 @@ export const processMonthlyPayments = async () => {
 
             await t.commit();
             logger.info(`Opération mensuelle traitée : ${payment.name} pour l'user ${payment.userId}`);
+
+            // Notification push
+            const user = await User.findByPk(payment.userId);
+            if (user?.fcmToken && user.notificationPrefs?.paymentApplied !== false) {
+                const sign = payment.type === 'income' ? '+' : '-';
+                await sendPushNotification(
+                    user.fcmToken,
+                    'Paiement automatique appliqué',
+                    `${payment.name} — ${sign}${Number(payment.amount).toFixed(2)} €`
+                );
+            }
         } catch (error) {
             await t.rollback();
             logger.error(error, `Échec opération mensuelle ${payment.name}`);

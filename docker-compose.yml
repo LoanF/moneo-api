@@ -38,6 +38,7 @@ services:
     environment:
       - NODE_ENV=development
       - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+      - NODE_TLS_REJECT_UNAUTHORIZED=0
     networks:
       - postgres-network
 

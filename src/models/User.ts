@@ -2,6 +2,13 @@ import {DataTypes, Model, type Optional} from 'sequelize';
 import sequelize from '../config/database.js';
 import {hashPassword} from "../utils/password.js";
 
+export interface NotificationPrefs {
+    paymentApplied?: boolean;
+    lowBalance?: boolean;
+    monthlyRecap?: boolean;
+    activityReminder?: boolean;
+}
+
 interface UserAttributes {
     uid: string;
     username: string;
@@ -12,6 +19,11 @@ interface UserAttributes {
     fcmToken?: string | null;
     hasCompletedSetup: boolean;
     photoUrl?: string | null;
+    emailVerifiedAt?: Date | null;
+    emailVerificationCode?: string | null;
+    passwordResetCode?: string | null;
+    passwordResetExpires?: Date | null;
+    notificationPrefs?: NotificationPrefs | null;
 }
 
 interface UserCreationAttributes extends Optional<UserAttributes, 'uid' | 'hasCompletedSetup'> {}
@@ -22,10 +34,15 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
     declare email: string;
     declare password?: string;
     declare googleId?: string;
-    declare refreshToken?: string;
+    declare refreshToken?: string | null;
     declare fcmToken: string | null;
     declare hasCompletedSetup: boolean;
     declare photoUrl: string | null;
+    declare emailVerifiedAt: Date | null;
+    declare emailVerificationCode: string | null;
+    declare passwordResetCode: string | null;
+    declare passwordResetExpires: Date | null;
+    declare notificationPrefs: NotificationPrefs | null;
 }
 
 User.init({
@@ -38,6 +55,11 @@ User.init({
     fcmToken: { type: DataTypes.STRING, allowNull: true },
     hasCompletedSetup: { type: DataTypes.BOOLEAN, defaultValue: false, allowNull: false },
     photoUrl: { type: DataTypes.STRING, allowNull: true },
+    emailVerifiedAt: { type: DataTypes.DATE, allowNull: true },
+    emailVerificationCode: { type: DataTypes.STRING(6), allowNull: true },
+    passwordResetCode: { type: DataTypes.STRING(6), allowNull: true },
+    passwordResetExpires: { type: DataTypes.DATE, allowNull: true },
+    notificationPrefs: { type: DataTypes.JSONB, allowNull: true, defaultValue: null },
 }, {
     sequelize,
     modelName: 'User',

@@ -1,5 +1,5 @@
 import {createRoute, z} from '@hono/zod-openapi';
-import {RegisterSchema, AuthResponseSchema, ErrorSchema, LoginSchema, GoogleSchema, RefreshSchema, RefreshResponseSchema, UserSchema, UpdateProfileSchema} from '../schemas/auth.schema.js';
+import {RegisterSchema, AuthResponseSchema, ErrorSchema, LoginSchema, GoogleSchema, RefreshSchema, RefreshResponseSchema, UserSchema, UpdateProfileSchema, VerifyEmailSchema, ForgotPasswordSchema, ResetPasswordSchema} from '../schemas/auth.schema.js';
 
 export const registerRoute = createRoute({
     method: 'post',
@@ -125,5 +125,53 @@ export const logoutRoute = createRoute({
     security: [{ Bearer: [] }],
     responses: {
         200: { content: { 'application/json': { schema: z.object({ success: z.boolean() }) } }, description: 'Déconnecté' }
+    }
+});
+
+export const verifyEmailRoute = createRoute({
+    method: 'post',
+    path: '/verify-email',
+    summary: 'Vérifier l\'adresse email',
+    tags: ['Authentification'],
+    security: [{ Bearer: [] }],
+    request: { body: { content: { 'application/json': { schema: VerifyEmailSchema } } } },
+    responses: {
+        200: { content: { 'application/json': { schema: z.object({ success: z.boolean() }) } }, description: 'Email vérifié' },
+        400: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Code invalide ou expiré' },
+    }
+});
+
+export const resendVerificationRoute = createRoute({
+    method: 'post',
+    path: '/resend-verification',
+    summary: 'Renvoyer le code de vérification',
+    tags: ['Authentification'],
+    security: [{ Bearer: [] }],
+    responses: {
+        200: { content: { 'application/json': { schema: z.object({ success: z.boolean() }) } }, description: 'Code renvoyé' },
+        400: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Email déjà vérifié' },
+    }
+});
+
+export const forgotPasswordRoute = createRoute({
+    method: 'post',
+    path: '/forgot-password',
+    summary: 'Demander une réinitialisation de mot de passe',
+    tags: ['Authentification'],
+    request: { body: { content: { 'application/json': { schema: ForgotPasswordSchema } } } },
+    responses: {
+        200: { content: { 'application/json': { schema: z.object({ success: z.boolean() }) } }, description: 'Code envoyé si l\'email existe' },
+    }
+});
+
+export const resetPasswordRoute = createRoute({
+    method: 'post',
+    path: '/reset-password',
+    summary: 'Réinitialiser le mot de passe',
+    tags: ['Authentification'],
+    request: { body: { content: { 'application/json': { schema: ResetPasswordSchema } } } },
+    responses: {
+        200: { content: { 'application/json': { schema: z.object({ success: z.boolean() }) } }, description: 'Mot de passe réinitialisé' },
+        400: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Code invalide ou expiré' },
     }
 });
