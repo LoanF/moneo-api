@@ -5,10 +5,12 @@ import {OAuth2Client} from 'google-auth-library';
 import {Transaction, UniqueConstraintError} from 'sequelize';
 import sequelize from '../config/database.js';
 import User from '../models/User.js';
-import {googleRoute, loginRoute, logoutRoute, meRoute, refreshRoute, registerRoute, updateProfileRoute, uploadAvatarRoute} from '../definitions/auth.definitions.js';
+import {googleRoute, loginRoute, logoutRoute, meRoute, refreshRoute, registerRoute, updateProfileRoute, uploadAvatarRoute, verifyEmailRoute, resendVerificationRoute, forgotPasswordRoute, resetPasswordRoute} from '../definitions/auth.definitions.js';
 import {PutObjectCommand, S3Client} from "@aws-sdk/client-s3";
 import {verifyPassword} from "../utils/password.js";
+import {hashPassword} from "../utils/password.js";
 import {seedUserCategories} from "../utils/seeder.js";
+import {sendVerificationEmail, sendPasswordResetEmail} from "../services/messagingService.js";
 import {authMiddleware} from "../middleware/auth.js";
 import {createRateLimiter} from "../middleware/rateLimiter.js";
 import {logger} from "../utils/logger.js";
@@ -17,10 +19,14 @@ const auth = new OpenAPIHono<AppEnv>();
 const protectedAuth = new OpenAPIHono<AppEnv>();
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
+const generateCode = (): string => Math.floor(100000 + Math.random() * 900000).toString();
+
 auth.use('/register', createRateLimiter(5, 10 * 60 * 1000));
 auth.use('/login', createRateLimiter(5, 15 * 60 * 1000));
 auth.use('/google', createRateLimiter(10, 60 * 1000));
 auth.use('/refresh', createRateLimiter(10, 60 * 1000));
+auth.use('/forgot-password', createRateLimiter(3, 15 * 60 * 1000));
+auth.use('/reset-password', createRateLimiter(5, 15 * 60 * 1000));
 
 protectedAuth.use('*', authMiddleware);
 
@@ -58,7 +64,9 @@ const buildAuthPayload = async (user: User, fcmToken?: string, transaction?: Tra
             email: user.email,
             photoUrl: user.photoUrl || null,
             fcmToken: user.fcmToken || null,
-            hasCompletedSetup: user.hasCompletedSetup
+            hasCompletedSetup: user.hasCompletedSetup,
+            emailVerified: user.emailVerifiedAt !== null,
+            notificationPrefs: user.notificationPrefs || { paymentApplied: true, lowBalance: true, monthlyRecap: true, activityReminder: true },
         }
     };
 };
@@ -68,16 +76,23 @@ auth.openapi(registerRoute, async (c) => {
     try {
         const body = c.req.valid('json');
 
+        const verificationCode = generateCode();
         const user = await User.create({
             username: body.username,
             email: body.email.toLowerCase(),
-            password: body.password
+            password: body.password,
+            emailVerificationCode: verificationCode,
         }, {transaction});
 
         await seedUserCategories(user.uid, transaction);
 
         const payload = await buildAuthPayload(user, body.fcmToken, transaction);
         await transaction.commit();
+
+        sendVerificationEmail(user.email, verificationCode).catch((err) =>
+            logger.error({ err }, 'sendVerificationEmail failed (non-blocking)')
+        );
+
         return c.json(payload, 201);
     } catch (error) {
         await transaction.rollback();
@@ -113,7 +128,8 @@ auth.openapi(googleRoute, async (c) => {
                 username: name || 'User',
                 email: email,
                 googleId: sub,
-                photoUrl: picture || null
+                photoUrl: picture || null,
+                emailVerifiedAt: new Date(),
             }
         });
 
@@ -121,9 +137,10 @@ auth.openapi(googleRoute, async (c) => {
             await seedUserCategories(user.uid);
         }
 
-        if (!created && !user.googleId) {
-            user.googleId = sub;
+        if (!created) {
+            if (!user.googleId) user.googleId = sub;
             if (!user.photoUrl && picture) user.photoUrl = picture;
+            if (!user.emailVerifiedAt) user.emailVerifiedAt = new Date();
             if (!fcmToken) await user.save();
         }
 
@@ -172,7 +189,9 @@ protectedAuth.openapi(updateProfileRoute, async (c) => {
                 email: user.email,
                 photoUrl: user.photoUrl,
                 fcmToken: user.fcmToken,
-                hasCompletedSetup: user.hasCompletedSetup
+                hasCompletedSetup: user.hasCompletedSetup,
+                emailVerified: user.emailVerifiedAt !== null,
+                notificationPrefs: user.notificationPrefs || { paymentApplied: true, lowBalance: true, monthlyRecap: true, activityReminder: true },
             }, 200);
 
         } catch (error) {
@@ -220,7 +239,9 @@ protectedAuth.openapi(meRoute, async (c) => {
         email: user.email,
         photoUrl: user.photoUrl,
         fcmToken: user.fcmToken,
-        hasCompletedSetup: user.hasCompletedSetup
+        hasCompletedSetup: user.hasCompletedSetup,
+        emailVerified: user.emailVerifiedAt !== null,
+        notificationPrefs: user.notificationPrefs || { paymentApplied: true, lowBalance: true, monthlyRecap: true, activityReminder: true },
     }, 200);
 });
 
@@ -234,6 +255,80 @@ protectedAuth.openapi(logoutRoute, async (c) => {
     );
 
     return c.json({success: true}, 200);
+});
+
+protectedAuth.openapi(verifyEmailRoute, async (c) => {
+    const payload = c.get('jwtPayload');
+    const { code } = c.req.valid('json');
+
+    const user = await User.findByPk(payload.id);
+    if (!user) return c.json({ error: "Utilisateur non trouvé" }, 400);
+    if (user.emailVerifiedAt !== null) return c.json({ success: true }, 200);
+    if (user.emailVerificationCode !== code) return c.json({ error: "Code invalide" }, 400);
+
+    user.emailVerifiedAt = new Date();
+    user.emailVerificationCode = null;
+    await user.save();
+
+    return c.json({ success: true }, 200);
+});
+
+protectedAuth.openapi(resendVerificationRoute, async (c) => {
+    const payload = c.get('jwtPayload');
+    const user = await User.findByPk(payload.id);
+    if (!user) return c.json({ error: "Utilisateur non trouvé" }, 400);
+    if (user.emailVerifiedAt !== null) return c.json({ error: "Email déjà vérifié" }, 400);
+
+    const code = generateCode();
+    user.emailVerificationCode = code;
+    await user.save();
+
+    sendVerificationEmail(user.email, code).catch((err) =>
+        logger.error({ err }, 'resendVerificationEmail failed (non-blocking)')
+    );
+
+    return c.json({ success: true }, 200);
+});
+
+auth.openapi(forgotPasswordRoute, async (c) => {
+    const { email } = c.req.valid('json');
+    const user = await User.findOne({ where: { email: email.toLowerCase() } });
+
+    if (!user || !user.password) return c.json({ success: true }, 200);
+
+    const code = generateCode();
+    user.passwordResetCode = code;
+    user.passwordResetExpires = new Date(Date.now() + 15 * 60 * 1000);
+    await user.save();
+
+    sendPasswordResetEmail(user.email, code).catch((err) =>
+        logger.error({ err }, 'sendPasswordResetEmail failed (non-blocking)')
+    );
+
+    return c.json({ success: true }, 200);
+});
+
+auth.openapi(resetPasswordRoute, async (c) => {
+    const { email, code, newPassword } = c.req.valid('json');
+    const user = await User.findOne({ where: { email: email.toLowerCase() } });
+
+    if (
+        !user ||
+        !user.passwordResetCode ||
+        user.passwordResetCode !== code ||
+        !user.passwordResetExpires ||
+        user.passwordResetExpires < new Date()
+    ) {
+        return c.json({ error: "Code invalide ou expiré" }, 400);
+    }
+
+    user.password = await hashPassword(newPassword);
+    user.passwordResetCode = null;
+    user.passwordResetExpires = null;
+    user.refreshToken = null;
+    await user.save({ hooks: false });
+
+    return c.json({ success: true }, 200);
 });
 
 auth.route('/', protectedAuth);

@@ -10,6 +10,8 @@ import sequelize from './config/database.js';
 import type { AppEnv } from './types.js';
 import {authMiddleware} from './middleware/auth.js';
 import {processMonthlyPayments} from './services/monthlyProcessor.js';
+import {initFirebase} from './services/fcmService.js';
+import './services/notificationScheduler.js';
 
 // Routes
 import authRoutes from './routes/auth.js';
@@ -166,6 +168,7 @@ const startServer = async () => {
             await sequelize.sync({alter: true});
         }
 
+        await initFirebase();
         await processMonthlyPayments();
 
         logger.info(`Server running on port ${port} | Docs: http://localhost:${port}/api-docs`);

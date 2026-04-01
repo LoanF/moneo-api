@@ -3,11 +3,15 @@ import type { AppEnv } from '../types.js';
 import Transaction from '../models/Transaction.js';
 import BankAccount from '../models/BankAccount.js';
 import Category from '../models/Category.js';
+import User from '../models/User.js';
 import { authMiddleware } from '../middleware/auth.js';
 import {createTransactionRoute, listTransactionsRoute, deleteTransactionRoute, createTransferRoute, getStatsRoute, updateTransactionRoute} from '../definitions/transaction.definitions.js';
 import sequelize from '../config/database.js';
 import { Op, fn, col } from 'sequelize';
 import { logger } from '../utils/logger.js';
+import { sendPushNotification } from '../services/fcmService.js';
+
+const LOW_BALANCE_THRESHOLD = 100;
 
 const transactions = new OpenAPIHono<AppEnv>();
 
@@ -69,6 +73,20 @@ transactions.openapi(createTransactionRoute, async (c) => {
         await account.save({ transaction: t });
 
         await t.commit();
+
+        // Notification solde bas (dépenses uniquement)
+        if (body.type === 'expense' && Number(account.balance) < LOW_BALANCE_THRESHOLD) {
+            User.findByPk(user.id).then((dbUser) => {
+                if (dbUser?.fcmToken && dbUser.notificationPrefs?.lowBalance !== false) {
+                    sendPushNotification(
+                        dbUser.fcmToken,
+                        'Solde bas',
+                        `Votre solde est de ${Number(account.balance).toFixed(2)} €. Pensez à alimenter votre compte.`
+                    );
+                }
+            }).catch(() => {});
+        }
+
         return c.json(transaction, 201);
     } catch (error) {
         await t.rollback();
