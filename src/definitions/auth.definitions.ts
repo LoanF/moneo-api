@@ -175,3 +175,15 @@ export const resetPasswordRoute = createRoute({
         400: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Code invalide ou expiré' },
     }
 });
+
+export const deleteAccountRoute = createRoute({
+    method: 'delete',
+    path: '/me',
+    summary: 'Supprimer le compte utilisateur',
+    tags: ['Authentification'],
+    security: [{ Bearer: [] }],
+    responses: {
+        200: { content: { 'application/json': { schema: z.object({ success: z.boolean() }) } }, description: 'Compte supprimé' },
+        404: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Utilisateur non trouvé' },
+    }
+});

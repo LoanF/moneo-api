@@ -14,12 +14,12 @@ interface BankAccountAttributes {
 interface BankAccountCreationAttributes extends Optional<BankAccountAttributes, 'id' | 'balance' | 'currency'> {}
 
 class BankAccount extends Model<BankAccountAttributes, BankAccountCreationAttributes> implements BankAccountAttributes {
-    public id!: string;
-    public userId!: string;
-    public name!: string;
-    public type!: string;
-    public balance!: number;
-    public currency!: string;
+    declare id: string;
+    declare userId: string;
+    declare name: string;
+    declare type: string;
+    declare balance: number;
+    declare currency: string;
 }
 
 BankAccount.init({
