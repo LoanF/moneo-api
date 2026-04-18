@@ -22,4 +22,4 @@ COPY --from=builder /usr/src/app/dist ./dist
 COPY --from=builder /usr/src/app/package.json /usr/src/app/pnpm-lock.yaml ./
 RUN pnpm install --prod --frozen-lockfile
 EXPOSE 3000
-CMD ["node", "dist/index.js"]
+CMD ["node", "dist/src/index.js"]
