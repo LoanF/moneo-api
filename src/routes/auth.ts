@@ -4,8 +4,13 @@ import {sign, verify} from 'hono/jwt';
 import {OAuth2Client} from 'google-auth-library';
 import {Transaction, UniqueConstraintError} from 'sequelize';
 import sequelize from '../config/database.js';
+import TransactionModel from '../models/Transaction.js';
+import BankAccount from '../models/BankAccount.js';
+import Category from '../models/Category.js';
+import PaymentMethod from '../models/PaymentMethod.js';
+import MonthlyPayment from '../models/MonthlyPayment.js';
 import User from '../models/User.js';
-import {googleRoute, loginRoute, logoutRoute, meRoute, refreshRoute, registerRoute, updateProfileRoute, uploadAvatarRoute, verifyEmailRoute, resendVerificationRoute, forgotPasswordRoute, resetPasswordRoute} from '../definitions/auth.definitions.js';
+import {googleRoute, loginRoute, logoutRoute, meRoute, refreshRoute, registerRoute, updateProfileRoute, uploadAvatarRoute, verifyEmailRoute, resendVerificationRoute, forgotPasswordRoute, resetPasswordRoute, deleteAccountRoute} from '../definitions/auth.definitions.js';
 import {PutObjectCommand, S3Client} from "@aws-sdk/client-s3";
 import {verifyPassword} from "../utils/password.js";
 import {hashPassword} from "../utils/password.js";
@@ -327,6 +332,23 @@ auth.openapi(resetPasswordRoute, async (c) => {
     user.passwordResetExpires = null;
     user.refreshToken = null;
     await user.save({ hooks: false });
+
+    return c.json({ success: true }, 200);
+});
+
+protectedAuth.openapi(deleteAccountRoute, async (c) => {
+    const payload = c.get('jwtPayload');
+    const userId = payload.id;
+
+    const user = await User.findByPk(userId);
+    if (!user) return c.json({ error: "Utilisateur non trouvé" }, 404);
+
+    await TransactionModel.destroy({ where: { userId } });
+    await MonthlyPayment.destroy({ where: { userId } });
+    await BankAccount.destroy({ where: { userId } });
+    await Category.destroy({ where: { userId } });
+    await PaymentMethod.destroy({ where: { userId } });
+    await user.destroy();
 
     return c.json({ success: true }, 200);
 });
