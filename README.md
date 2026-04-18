@@ -198,4 +198,4 @@ The multi-stage Dockerfile produces a minimal production image with only compile
 
 Set `DATABASE_URL` to your managed PostgreSQL instance. The app runs `sequelize.sync({ alter: true })` on startup, which applies non-destructive schema changes automatically.
 
-> For zero-downtime production deployments, replace `alter: true` with proper Sequelize migrations.
+> For zero-downtime production deployments, replace `alter: true` with proper Sequelize migrations. 
