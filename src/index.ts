@@ -1,4 +1,5 @@
 import {serve} from '@hono/node-server';
+import { serveStatic } from '@hono/node-server/serve-static'
 import {OpenAPIHono} from '@hono/zod-openapi';
 import {logger as honoLogger} from 'hono/logger';
 import {cors} from 'hono/cors';
@@ -45,6 +46,8 @@ app.use('*', cors({
     exposeHeaders: ['Content-Length', 'X-Total-Count'],
     maxAge: 600,
 }));
+
+app.use('/assets/*', serveStatic({ root: './' }))
 
 // --- CONFIGURATION V1 ---
 const v1 = new OpenAPIHono<AppEnv>();
