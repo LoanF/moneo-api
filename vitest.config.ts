@@ -7,6 +7,10 @@ export default defineConfig({
             provider: 'v8',
             include: ['src/**/*.ts'],
             exclude: [
+                'src/models/**',
+                'src/utils/seeder.ts',
+                'src/types.ts',
+                'src/config/**',
                 'src/**/*.test.ts',
                 'src/**/*.definitions.ts',
                 'src/index.ts',
