@@ -1,4 +1,4 @@
-name: CI
+name: CI/CD
 
 on:
   push:
@@ -7,17 +7,70 @@ on:
     branches: [main, master]
 
 jobs:
+  # ─── Intégration continue ───────────────────────────────────────────────────
   check:
+    name: Vérification & Tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+
       - uses: pnpm/action-setup@v4
         with:
           version: latest
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'pnpm'
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm exec tsc --noEmit
-      - run: pnpm test
+
+      - name: Installer les dépendances
+        run: pnpm install --frozen-lockfile
+
+      - name: Vérification TypeScript
+        run: pnpm exec tsc --noEmit
+
+      - name: Tests unitaires avec couverture
+        run: pnpm test:coverage
+
+      - name: Publier le rapport de couverture
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-report
+          path: coverage/
+          retention-days: 7
+
+  # ─── Déploiement continu ─────────────────────────────────────────────────────
+  build:
+    name: Build Docker Image
+    needs: check
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master' && github.event_name == 'push'
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extraire les métadonnées
+        id: meta
+        run: |
+          echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+          echo "version=$(node -p \"require('./package.json').version\")" >> $GITHUB_OUTPUT
+
+      - name: Build de l'image Docker (production)
+        run: |
+          docker build \
+            --target production \
+            --tag moneo-api:${{ steps.meta.outputs.sha_short }} \
+            --tag moneo-api:${{ steps.meta.outputs.version }} \
+            --tag moneo-api:latest \
+            .
+
+      - name: Vérification de l'image construite
+        run: |
+          docker inspect moneo-api:latest --format='Ports exposés : {{.Config.ExposedPorts}}'
+          docker inspect moneo-api:latest --format='Commande : {{.Config.Cmd}}'
+          echo "✅ Image moneo-api:${{ steps.meta.outputs.sha_short }} prête au déploiement"
+
+      # Étape de déploiement à adapter selon la plateforme cible :
+      # - Railway / Render : push vers leur registry via CLI
+      # - VPS : SSH + docker pull + docker-compose up -d
+      # - Fly.io : flyctl deploy --image moneo-api:latest
