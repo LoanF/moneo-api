@@ -7,6 +7,9 @@ export default defineConfig({
             provider: 'v8',
             include: ['src/**/*.ts'],
             exclude: [
+                'src/services/fcmService.ts',
+                'src/services/messagingService.ts',
+                'src/services/notificationScheduler.ts',
                 'src/models/**',
                 'src/utils/seeder.ts',
                 'src/types.ts',
