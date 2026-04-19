@@ -10,9 +10,12 @@ import {EventEmitter} from 'node:events';
 import sequelize from './config/database.js';
 import type { AppEnv } from './types.js';
 import {authMiddleware} from './middleware/auth.js';
+import {securityHeaders} from './middleware/securityHeaders.js';
 import {processMonthlyPayments} from './services/monthlyProcessor.js';
 import {initFirebase} from './services/fcmService.js';
 import './services/notificationScheduler.js';
+
+import pkg from '../package.json' with {type: 'json'};
 
 // Routes
 import authRoutes from './routes/auth.js';
@@ -30,14 +33,13 @@ import './models/PaymentMethod.js';
 import './models/MonthlyPayment.js';
 import './models/Transaction.js';
 
-import pkg from '../package.json' with {type: 'json'};
-
 const app = new OpenAPIHono<AppEnv>();
 const eventBus = new EventEmitter();
 eventBus.setMaxListeners(1000);
 
 const port = Number(process.env.PORT) || 3000;
 
+app.use('*', securityHeaders);
 app.use('*', honoLogger());
 app.use('*', cors({
     origin: (process.env.ALLOWED_ORIGINS || '*').split(','),
@@ -163,6 +165,26 @@ sequelize.addHook('afterUpdate', (instance) => emitChange('UPDATE', instance));
 sequelize.addHook('afterDestroy', (instance) => emitChange('DELETE', instance));
 
 app.get('/', (c) => c.text('Moneo API is Live'));
+
+app.get('/health', async (c) => {
+    const start = Date.now();
+    let dbStatus = 'connected';
+
+    try {
+        await sequelize.authenticate();
+    } catch {
+        dbStatus = 'disconnected';
+    }
+
+    return c.json({
+        status: dbStatus === 'connected' ? 'ok' : 'degraded',
+        version: pkg.version,
+        uptime: Math.floor(process.uptime()),
+        database: dbStatus,
+        timestamp: new Date().toISOString(),
+        responseTime: `${Date.now() - start}ms`,
+    }, dbStatus === 'connected' ? 200 : 503);
+});
 
 const startServer = async () => {
     try {

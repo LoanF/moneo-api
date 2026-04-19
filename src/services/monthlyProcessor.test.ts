@@ -24,6 +24,14 @@ vi.mock('../config/database.js', () => ({
     default: { transaction: vi.fn() },
 }));
 
+vi.mock('../models/User.js', () => ({
+    default: { findByPk: vi.fn() },
+}));
+
+vi.mock('./fcmService.js', () => ({
+    sendPushNotification: vi.fn(),
+}));
+
 import MonthlyPayment from '../models/MonthlyPayment.js';
 import Transaction from '../models/Transaction.js';
 import BankAccount from '../models/BankAccount.js';
