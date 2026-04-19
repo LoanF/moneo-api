@@ -1,6 +1,22 @@
 # Moneo API
 
-REST API for the Moneo personal finance app, built with **Hono**, **TypeScript**, **Sequelize** and **PostgreSQL**.
+<div align="center">
+
+<img src="https://img.shields.io/badge/Node.js-24-339933?logo=node.js&logoColor=white"  alt="node" />
+<img src="https://img.shields.io/badge/Hono-000?logo=hono&logoColor=FF7233"  alt="hono" />
+<img src="https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white"  alt="typescript" />
+<img src="https://img.shields.io/badge/PostgreSQL-336791?logo=postgresql&logoColor=white"  alt="postgresql" />
+<img src="https://img.shields.io/badge/Sequelize-52B0E7?logo=sequelize&logoColor=white"  alt="sequelize" />
+
+[![CI/CD Status](https://github.com/LoanF/moneo-api/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/LoanF/moneo-api/actions/workflows/ci-cd.yml)
+![Latest Release](https://img.shields.io/github/v/release/LoanF/moneo-api?label=version&color=blue)
+[![Codecov](https://codecov.io/github/LoanF/moneo-api/graph/badge.svg?token=QBYZ2AZSLY)](https://codecov.io/github/LoanF/moneo-api)
+![License](https://img.shields.io/github/license/LoanF/moneo-api)
+[![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
+
+**REST API for the Moneo personal finance app** *Built with Hono, TypeScript, Sequelize and PostgreSQL*
+
+</div>
 
 ## Features
 

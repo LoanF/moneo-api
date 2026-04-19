@@ -129,7 +129,7 @@ Moneo is a high-performance personal finance management API built with **Hono** 
 Most endpoints require a valid **Bearer Token** in the authorization header. You can obtain one by using the \`/auth/login\` or \`/auth/google\` endpoints.
         `.trim(),
     },
-    servers: [{url: `http://localhost:${port}/api/v1`, description: 'Serveur V1'}],
+    servers: [{url: `https://moneo-app.com/api/v1`, description: 'Serveur V1'}],
 });
 
 v1.openAPIRegistry.registerComponent('securitySchemes', 'Bearer', {

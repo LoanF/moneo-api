@@ -18,7 +18,7 @@ export default defineConfig({
                 'src/**/*.definitions.ts',
                 'src/index.ts',
             ],
-            reporter: ['text', 'json', 'html'],
+            reporter: ['text', 'json', 'html', 'lcov'],
             thresholds: {
                 lines: 50,
                 functions: 50,
