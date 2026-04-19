@@ -170,32 +170,87 @@ pnpm test
 # Watch mode
 pnpm test:watch
 
-# Coverage report
+# Coverage report (seuil minimum : 50 % lignes/fonctions, 40 % branches)
 pnpm test:coverage
 ```
 
-Tests cover: Zod auth schemas, rate limiter middleware, password hashing, monthly payment processor.
+### Ce qui est couvert
+
+| Fichier | Ce qui est testé |
+|---|---|
+| `middleware/auth.test.ts` | Header absent → 401, token invalide/expiré → 401, token valide → payload injecté dans le contexte, secret lu depuis l'env |
+| `middleware/securityHeaders.test.ts` | Présence de chaque header OWASP (X-Content-Type-Options, X-Frame-Options, X-XSS-Protection, Referrer-Policy, Permissions-Policy), HSTS uniquement en production, statut et corps inchangés |
+| `middleware/rateLimiter.test.ts` | Requêtes sous le seuil acceptées, dépassement → 429, fenêtre glissante |
+| `schemas/auth.test.ts` | Validation Zod : email, mot de passe (complexité), champs requis/optionnels |
+| `utils/password.test.ts` | Hachage bcrypt non-réversible, vérification correcte, rejet mauvais mot de passe |
+| `routes/auth.test.ts` | Login (200/401/400), refresh (200/403), forgot-password (anti-énumération), register (201/400) |
+| `routes/bankAccount.test.ts` | CRUD complet, idempotence POST, 404, rollback sur erreur |
+| `routes/transaction.test.ts` | Liste paginée + `X-Total-Count`, création dépense/revenu (balance mise à jour), idempotence, suppression avec annulation du solde, transfert entre comptes |
+| `services/monthlyProcessor.test.ts` | Aucun paiement dû, dépense/revenu traités, rollback sur erreur, gestion fin de mois |
+
+Le rapport HTML est généré dans `coverage/` et archivé dans GitHub Actions à chaque run.
+
+## CI/CD
+
+Le pipeline GitHub Actions se déclenche sur chaque push vers `develop` et `master`.
+
+```
+push → [check] TypeScript + tests + couverture → [deploy*] docker compose up
+                                                  * master uniquement, runner self-hosted
+```
+
+### Intégration continue (toutes branches)
+
+1. Vérification TypeScript (`tsc --noEmit`)
+2. Tests unitaires avec rapport de couverture (`vitest --coverage`)
+3. Archivage du rapport de couverture (artifact GitHub Actions, 7 jours)
+
+### Déploiement continu (master uniquement)
+
+Le déploiement s'effectue via un **runner self-hosted** installé sur le conteneur LXC Proxmox qui héberge la production. Aucune clé SSH ni registry externe requis — le runner exécute directement :
+
+```bash
+docker compose up -d --build
+docker compose ps
+```
+
+### Installer le runner self-hosted
+
+Sur le LXC Ubuntu, depuis l'interface GitHub (`Settings → Actions → Runners → New self-hosted runner`) :
+
+```bash
+mkdir actions-runner && cd actions-runner
+curl -o actions-runner-linux-x64.tar.gz -L https://github.com/actions/runner/releases/latest/download/actions-runner-linux-x64-<version>.tar.gz
+tar xzf actions-runner-linux-x64.tar.gz
+./config.sh --url https://github.com/<org>/<repo> --token <TOKEN>
+sudo ./svc.sh install && sudo ./svc.sh start
+```
+
+Le runner démarre automatiquement au boot via systemd.
 
 ## Deployment
 
-### Build
+### Docker Compose (production)
 
 ```bash
-pnpm build   # outputs to dist/
-pnpm start   # runs dist/src/index.js
+cp .env.example .env   # remplir les variables
+docker compose up -d --build
 ```
 
-### Docker (production)
+### Base de données
+
+Définir `DATABASE_URL` dans `.env`. Au démarrage, l'app applique automatiquement les changements de schéma non-destructifs (`sequelize.sync({ alter: true })`).
+
+Pour appliquer les migrations manuellement :
 
 ```bash
-docker build --target production -t moneo-api .
-docker run -p 3000:3000 --env-file .env moneo-api
+npx sequelize-cli db:migrate
 ```
 
-The multi-stage Dockerfile produces a minimal production image with only compiled output and production dependencies.
+### Health check
 
-### Database in production
+```
+GET /health
+```
 
-Set `DATABASE_URL` to your managed PostgreSQL instance. The app runs `sequelize.sync({ alter: true })` on startup, which applies non-destructive schema changes automatically.
-
-> For zero-downtime production deployments, replace `alter: true` with proper Sequelize migrations. 
+Retourne `200 ok` si la base est joignable, `503 degraded` sinon.
