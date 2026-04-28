@@ -1,5 +1,4 @@
-import { OpenAPIHono } from '@hono/zod-openapi';
-import type { AppEnv } from '../types.js';
+import { createRouter } from '../utils/router.js';
 import Transaction from '../models/Transaction.js';
 import BankAccount from '../models/BankAccount.js';
 import Category from '../models/Category.js';
@@ -13,7 +12,7 @@ import { sendPushNotification } from '../services/fcmService.js';
 
 const LOW_BALANCE_THRESHOLD = 100;
 
-const transactions = new OpenAPIHono<AppEnv>();
+const transactions = createRouter();
 
 transactions.use('*', authMiddleware);
 
@@ -64,11 +63,9 @@ transactions.openapi(createTransactionRoute, async (c) => {
             return c.json({ error: "Compte introuvable" }, 404);
         }
 
-        // For transfers, amount is already signed (-X for source, +X for target)
-        // For income/expense, apply the conventional sign
-        const adjustment = body.type === 'transfer'
-            ? Number(body.amount)
-            : (body.type === 'income' ? Number(body.amount) : -Number(body.amount));
+        // Amount is always signed by the client (expense = negative, income = positive,
+        // transfer source = negative, transfer target = positive)
+        const adjustment = Number(body.amount);
         account.balance = Number(account.balance) + adjustment;
         await account.save({ transaction: t });
 
@@ -114,14 +111,29 @@ transactions.openapi(deleteTransactionRoute, async (c) => {
         const account = await BankAccount.findByPk(transaction.accountId, { transaction: t });
 
         if (account) {
-            const amountNum = Number(transaction.amount);
-            // Reverse the adjustment that was applied when the transaction was created
-            const reverseAdjustment = transaction.type === 'transfer'
-                ? -amountNum
-                : (transaction.type === 'income' ? -amountNum : amountNum);
-
-            account.balance = Number(account.balance) + reverseAdjustment;
+            account.balance = Number(account.balance) - Number(transaction.amount);
             await account.save({ transaction: t });
+        }
+
+        // For transfers, also delete the paired transaction and reverse its balance
+        if (transaction.type === 'transfer') {
+            const paired = await Transaction.findOne({
+                where: {
+                    userId: user.id,
+                    type: 'transfer',
+                    date: transaction.date,
+                    id: { [Op.ne]: transaction.id }
+                },
+                transaction: t
+            });
+            if (paired) {
+                const pairedAccount = await BankAccount.findByPk(paired.accountId, { transaction: t });
+                if (pairedAccount) {
+                    pairedAccount.balance = Number(pairedAccount.balance) - Number(paired.amount);
+                    await pairedAccount.save({ transaction: t });
+                }
+                await paired.destroy({ transaction: t });
+            }
         }
 
         await transaction.destroy({ transaction: t });
@@ -289,18 +301,12 @@ transactions.openapi(updateTransactionRoute, async (c) => {
         }
 
         const oldAmount = Number(transaction.amount);
-        const reverseAdjustment = transaction.type === 'transfer'
-            ? -oldAmount
-            : (transaction.type === 'income' ? -oldAmount : oldAmount);
-        account.balance = Number(account.balance) + reverseAdjustment;
+        account.balance = Number(account.balance) - oldAmount;
 
         await transaction.update(body, { transaction: t });
 
         const newAmount = Number(transaction.amount);
-        const newAdjustment = transaction.type === 'transfer'
-            ? newAmount
-            : (transaction.type === 'income' ? newAmount : -newAmount);
-        account.balance = Number(account.balance) + newAdjustment;
+        account.balance = Number(account.balance) + newAmount;
 
         await account.save({ transaction: t });
         await t.commit();

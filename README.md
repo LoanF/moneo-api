@@ -13,6 +13,7 @@
 [![Codecov](https://codecov.io/github/LoanF/moneo-api/graph/badge.svg?token=QBYZ2AZSLY)](https://codecov.io/github/LoanF/moneo-api)
 ![License](https://img.shields.io/github/license/LoanF/moneo-api)
 [![Conventional Commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg)](https://conventionalcommits.org)
+[![Status](https://status.moneo-app.com/api/badge/2/status)](https://status.moneo-app.com)
 
 **REST API for the Moneo personal finance app** *Built with Hono, TypeScript, Sequelize and PostgreSQL*
 
