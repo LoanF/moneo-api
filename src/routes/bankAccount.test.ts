@@ -14,11 +14,12 @@ vi.mock('../models/BankAccount.js', () => ({
         findAll: vi.fn(),
         findOrCreate: vi.fn(),
         findOne: vi.fn(),
+        max: vi.fn(),
     },
 }));
 
 vi.mock('../models/Transaction.js', () => ({
-    default: { destroy: vi.fn() },
+    default: { destroy: vi.fn(), findAll: vi.fn() },
 }));
 
 vi.mock('../models/MonthlyPayment.js', () => ({
@@ -34,6 +35,7 @@ vi.mock('../utils/logger.js', () => ({
 }));
 
 import BankAccount from '../models/BankAccount.js';
+import Transaction from '../models/Transaction.js';
 import sequelize from '../config/database.js';
 import accountRoutes from './bankAccount.js';
 
@@ -42,12 +44,17 @@ app.route('/', accountRoutes);
 
 const VALID_UUID = '550e8400-e29b-41d4-a716-446655440000';
 
+const makeAccount = (data: Record<string, any>) => ({ ...data, toJSON: () => data });
+
 describe('GET / — lister les comptes', () => {
-    beforeEach(() => vi.clearAllMocks());
+    beforeEach(() => {
+        vi.clearAllMocks();
+        vi.mocked(Transaction.findAll).mockResolvedValue([] as any);
+    });
 
     it('retourne 200 avec la liste des comptes', async () => {
         vi.mocked(BankAccount.findAll).mockResolvedValue([
-            { id: VALID_UUID, name: 'Compte courant', balance: 1500 } as any,
+            makeAccount({ id: VALID_UUID, name: 'Compte courant', balance: 1500 }) as any,
         ]);
 
         const res = await app.request('/');
@@ -55,6 +62,7 @@ describe('GET / — lister les comptes', () => {
         const data = await res.json();
         expect(Array.isArray(data)).toBe(true);
         expect(data[0].id).toBe(VALID_UUID);
+        expect(data[0].pointedBalance).toBe(1500);
     });
 
     it('retourne un tableau vide si aucun compte', async () => {
@@ -69,7 +77,8 @@ describe('POST / — créer un compte', () => {
     beforeEach(() => vi.clearAllMocks());
 
     it('crée un nouveau compte et retourne 201', async () => {
-        const newAccount = { id: VALID_UUID, name: 'Épargne', balance: 0, currency: 'EUR' };
+        vi.mocked(BankAccount.max).mockResolvedValue(0 as any);
+        const newAccount = makeAccount({ id: VALID_UUID, name: 'Épargne', balance: 0, currency: 'EUR' });
         vi.mocked(BankAccount.findOrCreate).mockResolvedValue([newAccount as any, true]);
 
         const res = await app.request('/', {
@@ -82,7 +91,8 @@ describe('POST / — créer un compte', () => {
     });
 
     it('retourne 200 si le compte existe déjà (idempotence)', async () => {
-        const existing = { id: VALID_UUID, name: 'Courant', balance: 1000 };
+        vi.mocked(BankAccount.max).mockResolvedValue(0 as any);
+        const existing = makeAccount({ id: VALID_UUID, name: 'Courant', balance: 1000 });
         vi.mocked(BankAccount.findOrCreate).mockResolvedValue([existing as any, false]);
 
         const res = await app.request('/', {

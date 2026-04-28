@@ -9,9 +9,10 @@ interface BankAccountAttributes {
     type: string;
     balance: number;
     currency: string;
+    sortOrder: number;
 }
 
-interface BankAccountCreationAttributes extends Optional<BankAccountAttributes, 'id' | 'balance' | 'currency'> {}
+interface BankAccountCreationAttributes extends Optional<BankAccountAttributes, 'id' | 'balance' | 'currency' | 'sortOrder'> {}
 
 class BankAccount extends Model<BankAccountAttributes, BankAccountCreationAttributes> implements BankAccountAttributes {
     declare id: string;
@@ -20,6 +21,7 @@ class BankAccount extends Model<BankAccountAttributes, BankAccountCreationAttrib
     declare type: string;
     declare balance: number;
     declare currency: string;
+    declare sortOrder: number;
 }
 
 BankAccount.init({
@@ -33,6 +35,7 @@ BankAccount.init({
     type: { type: DataTypes.STRING, allowNull: false, defaultValue: 'checking' },
     balance: { type: DataTypes.FLOAT, allowNull: false, defaultValue: 0 },
     currency: { type: DataTypes.STRING, allowNull: false, defaultValue: 'EUR' },
+    sortOrder: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 },
 }, {
     sequelize,
     modelName: 'BankAccount',
