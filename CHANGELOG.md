@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://github.com/LoanF/moneo-api/compare/v1.1.0...v1.2.0) (2026-04-28)
+
+
+### Features
+
+* add uptime ([3459799](https://github.com/LoanF/moneo-api/commit/3459799a453ce7bc71d3de1d6e37a46566f0d91e))
+
+
+### Bug Fixes
+
+* clarify error messages ([d336fb4](https://github.com/LoanF/moneo-api/commit/d336fb4ac7c265860b004be97431ca1714e86bea))
+* transaction unit tests ([27a0067](https://github.com/LoanF/moneo-api/commit/27a00671d6e21dfc26cb708d8ed5ece69a54c678))
+
 ## 1.1.0 (2026-04-19)
 
 
