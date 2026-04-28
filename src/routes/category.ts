@@ -1,11 +1,10 @@
-import { OpenAPIHono } from '@hono/zod-openapi';
 import Category from '../models/Category.js';
 import { authMiddleware } from '../middleware/auth.js';
-import type { AppEnv } from '../types.js';
+import { createRouter } from '../utils/router.js';
 import {createCategoryRoute, deleteCategoryRoute, listCategoriesRoute, updateCategoryRoute} from '../definitions/category.definitions.js';
 import { logger } from '../utils/logger.js';
 
-const categories = new OpenAPIHono<AppEnv>();
+const categories = createRouter();
 
 categories.use('*', authMiddleware);
 

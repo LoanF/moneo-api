@@ -1,11 +1,10 @@
-import { OpenAPIHono } from '@hono/zod-openapi';
 import MonthlyPayment from '../models/MonthlyPayment.js';
 import { authMiddleware } from '../middleware/auth.js';
-import type { AppEnv } from '../types.js';
+import { createRouter } from '../utils/router.js';
 import {createMonthlyPaymentRoute, deleteMonthlyPaymentRoute, listMonthlyPaymentsRoute, updateMonthlyPaymentRoute} from '../definitions/monthlyPayment.definitions.js';
 import { logger } from '../utils/logger.js';
 
-const monthlyPayments = new OpenAPIHono<AppEnv>();
+const monthlyPayments = createRouter();
 
 monthlyPayments.use('*', authMiddleware);
 

@@ -1,5 +1,4 @@
-import {OpenAPIHono} from '@hono/zod-openapi';
-import type { AppEnv } from '../types.js';
+import { createRouter } from '../utils/router.js';
 import {sign, verify} from 'hono/jwt';
 import {OAuth2Client} from 'google-auth-library';
 import {Transaction, UniqueConstraintError} from 'sequelize';
@@ -20,14 +19,14 @@ import {authMiddleware} from "../middleware/auth.js";
 import {createRateLimiter} from "../middleware/rateLimiter.js";
 import {logger} from "../utils/logger.js";
 
-const auth = new OpenAPIHono<AppEnv>();
-const protectedAuth = new OpenAPIHono<AppEnv>();
+const auth = createRouter();
+const protectedAuth = createRouter();
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const generateCode = (): string => Math.floor(100000 + Math.random() * 900000).toString();
 
 auth.use('/register', createRateLimiter(5, 10 * 60 * 1000));
-auth.use('/login', createRateLimiter(5, 15 * 60 * 1000));
+auth.use('/login', createRateLimiter(10, 15 * 60 * 1000));
 auth.use('/google', createRateLimiter(10, 60 * 1000));
 auth.use('/refresh', createRateLimiter(10, 60 * 1000));
 auth.use('/forgot-password', createRateLimiter(3, 15 * 60 * 1000));

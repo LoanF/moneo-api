@@ -30,12 +30,14 @@ export const processMonthlyPayments = async () => {
     for (const payment of pendingPayments) {
         const t = await sequelize.transaction();
         try {
+            const signedAmount = payment.type === 'income' ? Number(payment.amount) : -Number(payment.amount);
+
             await Transaction.create({
                 userId: payment.userId,
                 accountId: payment.accountId,
                 categoryId: payment.categoryId,
                 paymentMethodId: payment.paymentMethodId,
-                amount: payment.amount,
+                amount: signedAmount,
                 type: payment.type,
                 note: `[Automatique] ${payment.name}`,
                 date: today,
@@ -44,8 +46,7 @@ export const processMonthlyPayments = async () => {
 
             const account = await BankAccount.findByPk(payment.accountId, { transaction: t });
             if (account) {
-                const adjustment = payment.type === 'income' ? Number(payment.amount) : -Number(payment.amount);
-                account.balance = Number(account.balance) + adjustment;
+                account.balance = Number(account.balance) + signedAmount;
                 await account.save({ transaction: t });
             }
 
