@@ -102,7 +102,7 @@ describe('POST / — créer une transaction', () => {
         vi.mocked(sequelize.transaction).mockResolvedValue(t as any);
 
         const mockAccount = { id: ACC_UUID, balance: 1000, save: vi.fn() };
-        const mockTx = { id: TX_UUID, amount: 50, type: 'expense' };
+        const mockTx = { id: TX_UUID, amount: -50, type: 'expense' };
 
         vi.mocked(Transaction.findOrCreate).mockResolvedValue([mockTx as any, true]);
         vi.mocked(BankAccount.findByPk).mockResolvedValue(mockAccount as any);
@@ -111,7 +111,7 @@ describe('POST / — créer une transaction', () => {
         const res = await app.request('/', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: TX_UUID, accountId: ACC_UUID, amount: 50, type: 'expense' }),
+            body: JSON.stringify({ id: TX_UUID, accountId: ACC_UUID, amount: -50, type: 'expense' }),
         });
 
         expect(res.status).toBe(201);
@@ -183,7 +183,7 @@ describe('DELETE /:id — supprimer une transaction', () => {
         vi.mocked(sequelize.transaction).mockResolvedValue(t as any);
 
         const mockAccount = { id: ACC_UUID, balance: 950, save: vi.fn() };
-        const mockTx = { id: TX_UUID, accountId: ACC_UUID, amount: 50, type: 'expense', destroy: vi.fn() };
+        const mockTx = { id: TX_UUID, accountId: ACC_UUID, amount: -50, type: 'expense', destroy: vi.fn() };
 
         vi.mocked(Transaction.findOne).mockResolvedValue(mockTx as any);
         vi.mocked(BankAccount.findByPk).mockResolvedValue(mockAccount as any);
