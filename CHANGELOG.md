@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.3.0](https://github.com/LoanF/moneo-api/compare/v1.2.0...v1.3.0) (2026-04-28)
+
+
+### Features
+
+* sort bank account ([2a68110](https://github.com/LoanF/moneo-api/commit/2a6811096660aec765f596680f2a00ae992d6265))
+
 ## [1.2.0](https://github.com/LoanF/moneo-api/compare/v1.1.0...v1.2.0) (2026-04-28)
 
 
