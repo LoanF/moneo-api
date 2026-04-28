@@ -5,6 +5,7 @@ import {createBankAccountRoute, deleteBankAccountRoute, listBankAccountsRoute, u
 import Transaction from '../models/Transaction.js';
 import MonthlyPayment from "../models/MonthlyPayment.js";
 import sequelize from "../config/database.js";
+import { fn, col } from 'sequelize';
 import { logger } from '../utils/logger.js';
 
 const accounts = createRouter();
@@ -13,8 +14,28 @@ accounts.use('*', authMiddleware);
 
 accounts.openapi(listBankAccountsRoute, async (c) => {
     const user = c.get('jwtPayload');
-    const list = await BankAccount.findAll({ where: { userId: user.id } });
-    return c.json(list, 200);
+
+    const [list, uncheckedSums] = await Promise.all([
+        BankAccount.findAll({ where: { userId: user.id }, order: [['sortOrder', 'ASC'], ['createdAt', 'ASC']] }),
+        Transaction.findAll({
+            where: { userId: user.id, isChecked: false },
+            attributes: ['accountId', [fn('sum', col('amount')), 'total']],
+            group: ['accountId'],
+            raw: true,
+        })
+    ]);
+
+    const uncheckedByAccount: Record<string, number> = {};
+    for (const row of uncheckedSums as any[]) {
+        uncheckedByAccount[row.accountId] = Number(row.total) || 0;
+    }
+
+    const result = list.map(a => ({
+        ...a.toJSON(),
+        pointedBalance: Number(a.balance) - (uncheckedByAccount[a.id] || 0)
+    }));
+
+    return c.json(result, 200);
 });
 
 accounts.openapi(createBankAccountRoute, async (c) => {
@@ -22,15 +43,21 @@ accounts.openapi(createBankAccountRoute, async (c) => {
     const body = c.req.valid('json');
 
     try {
+        const maxSortOrder = (await BankAccount.max('sortOrder', { where: { userId: user.id } }) as number) ?? -1;
+
         const [account, created] = await BankAccount.findOrCreate({
-            where: {id: body.id},
+            where: { id: body.id },
             defaults: {
                 ...body,
-                userId: user.id
+                userId: user.id,
+                sortOrder: maxSortOrder + 1
             }
         });
 
-        return c.json(account, created ? 201 : 200);
+        return c.json({
+            ...account.toJSON(),
+            pointedBalance: Number(account.balance)
+        }, created ? 201 : 200);
     } catch (error) {
         logger.error(error);
         return c.json({ error: 'Une erreur interne est survenue' }, 500);
