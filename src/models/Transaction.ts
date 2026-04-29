@@ -10,6 +10,7 @@ interface TransactionAttributes {
     accountId: string;
     categoryId: string | null;
     paymentMethodId: string | null;
+    chequeNumber: string | null;
     amount: number;
     date: Date;
     note: string | null;
@@ -17,7 +18,7 @@ interface TransactionAttributes {
     isChecked: boolean;
 }
 
-export interface TransactionCreationAttributes extends Optional<TransactionAttributes, 'id' | 'isChecked' | 'note'> {}
+export interface TransactionCreationAttributes extends Optional<TransactionAttributes, 'id' | 'isChecked' | 'note' | 'chequeNumber'> {}
 
 class Transaction extends Model<TransactionAttributes, TransactionCreationAttributes> implements TransactionAttributes {
     declare id: string;
@@ -25,6 +26,7 @@ class Transaction extends Model<TransactionAttributes, TransactionCreationAttrib
     declare accountId: string;
     declare categoryId: string | null;
     declare paymentMethodId: string | null;
+    declare chequeNumber: string | null;
     declare amount: number;
     declare date: Date;
     declare note: string | null;
@@ -38,6 +40,7 @@ Transaction.init({
     accountId: { type: DataTypes.UUID, allowNull: false, references: { model: 'BankAccounts', key: 'id' } },
     categoryId: { type: DataTypes.UUID, allowNull: true, references: { model: 'Categories', key: 'id' } },
     paymentMethodId: { type: DataTypes.UUID, allowNull: true, references: { model: 'PaymentMethods', key: 'id' } },
+    chequeNumber: { type: DataTypes.STRING, allowNull: true },
     amount: { type: DataTypes.DECIMAL(15, 2), allowNull: false },
     date: { type: DataTypes.DATE, allowNull: false, defaultValue: DataTypes.NOW },
     note: { type: DataTypes.STRING, allowNull: true },
