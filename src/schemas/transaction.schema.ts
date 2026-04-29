@@ -10,6 +10,7 @@ export const TransactionResponseSchema = z.object({
     accountId: z.uuid(),
     categoryId: z.uuid().nullable(),
     paymentMethodId: z.uuid().nullable(),
+    chequeNumber: z.string().nullable(),
 }).openapi('TransactionResponse');
 
 export const CreateTransactionSchema = z.object({
@@ -19,6 +20,7 @@ export const CreateTransactionSchema = z.object({
     accountId: z.uuid(),
     categoryId: z.uuid().optional(),
     paymentMethodId: z.uuid().optional(),
+    chequeNumber: z.string().optional().nullable(),
     date: z.coerce.date().optional(),
     note: z.string().optional(),
     isChecked: z.boolean().optional().default(false)
