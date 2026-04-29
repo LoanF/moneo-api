@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.4.0](https://github.com/LoanF/moneo-api/compare/v1.3.0...v1.4.0) (2026-04-29)
+
+
+### Features
+
+* add cheque ([5e565ed](https://github.com/LoanF/moneo-api/commit/5e565edc7c16467aae4f529719afed5238d4d66c))
+* add cheque ([84e5a43](https://github.com/LoanF/moneo-api/commit/84e5a43f6bff06e78fff40289015f11520ad725e))
+* add cheque ([c547ef3](https://github.com/LoanF/moneo-api/commit/c547ef348a05c73606fa05fd9b7576cf9637a20a))
+
 ## [1.3.0](https://github.com/LoanF/moneo-api/compare/v1.2.0...v1.3.0) (2026-04-28)
 
 
