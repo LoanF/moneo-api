@@ -120,3 +120,6 @@ jobs:
           docker compose up -d --build
           docker compose ps
           docker image prune -f
+
+      - name: Appliquer les migrations
+        run: docker compose exec -T api npx sequelize-cli db:migrate
