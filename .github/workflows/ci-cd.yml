@@ -18,7 +18,7 @@ jobs:
 
       - uses: pnpm/action-setup@v6
         with:
-          version: latest
+          version: 10
 
       - uses: actions/setup-node@v6
         with:
@@ -120,3 +120,6 @@ jobs:
           docker compose up -d --build
           docker compose ps
           docker image prune -f
+
+      - name: Appliquer les migrations
+        run: docker compose exec -T api npx sequelize-cli db:migrate
