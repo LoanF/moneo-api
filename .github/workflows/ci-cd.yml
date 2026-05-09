@@ -56,7 +56,7 @@ jobs:
 
       - uses: pnpm/action-setup@v6
         with:
-          version: latest
+          version: 10
 
       - name: Installer les dépendances
         run: pnpm install --frozen-lockfile
