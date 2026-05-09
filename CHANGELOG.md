@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.4.2](https://github.com/LoanF/moneo-api/compare/v1.4.1...v1.4.2) (2026-05-09)
+
+
+### Bug Fixes
+
+* make chequeNumber migration idempotent ([2c1dece](https://github.com/LoanF/moneo-api/commit/2c1dece737d36f15b131d958de70f9009516af8a))
+
 ### [1.4.1](https://github.com/LoanF/moneo-api/compare/v1.4.0...v1.4.1) (2026-05-09)
 
 
