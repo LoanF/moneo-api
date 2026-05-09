@@ -101,6 +101,10 @@ export const uploadAvatarRoute = createRoute({
         400: {
             content: { 'application/json': { schema: ErrorSchema } },
             description: 'Requête invalide ou fichier manquant'
+        },
+        500: {
+            content: { 'application/json': { schema: ErrorSchema } },
+            description: 'Erreur lors de l\'upload'
         }
     }
 });
