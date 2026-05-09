@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.4.1](https://github.com/LoanF/moneo-api/compare/v1.4.0...v1.4.1) (2026-05-09)
+
+
+### Bug Fixes
+
+* limit account length ([4a960d9](https://github.com/LoanF/moneo-api/commit/4a960d9053519813bb69f88edfbc0ee461d58b45))
+* pin pnpm to v10 in CI to fix build script approval ([4c702b1](https://github.com/LoanF/moneo-api/commit/4c702b1039c6ed3e7269656180e335e310290630))
+* pin pnpm to v10 in CI to fix build script approval ([3af2c90](https://github.com/LoanF/moneo-api/commit/3af2c90055d5adee140c6007a6adce6cb5661606))
+
 ## [1.4.0](https://github.com/LoanF/moneo-api/compare/v1.3.0...v1.4.0) (2026-04-29)
 
 
