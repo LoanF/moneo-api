@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.4.4](https://github.com/LoanF/moneo-api/compare/v1.4.3...v1.4.4) (2026-05-09)
+
+
+### Bug Fixes
+
+* update avatar ([569535e](https://github.com/LoanF/moneo-api/commit/569535e2e79b9ad94a949b8946df7f716210493c))
+* update avatar ([d465035](https://github.com/LoanF/moneo-api/commit/d465035c7c36a37a29081ac5e8e985f7a2c5e89c))
+
 ### [1.4.3](https://github.com/LoanF/moneo-api/compare/v1.4.2...v1.4.3) (2026-05-09)
 
 
