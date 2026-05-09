@@ -211,24 +211,33 @@ protectedAuth.openapi(uploadAvatarRoute, async (c) => {
 
     if (!file) return c.json({error: "Aucun fichier fourni"}, 400);
 
-    const fileName = `avatars/${userPayload.id}-${Date.now()}-${file.name}`;
-    const fileBuffer = await file.arrayBuffer();
+    try {
+        const fileName = `avatars/${userPayload.id}-${Date.now()}-${file.name}`;
+        const fileBuffer = await file.arrayBuffer();
 
-    await s3.send(new PutObjectCommand({
-        Bucket: process.env.R2_BUCKET_NAME,
-        Key: fileName,
-        Body: Buffer.from(fileBuffer),
-        ContentType: file.type,
-    }));
+        await s3.send(new PutObjectCommand({
+            Bucket: process.env.R2_BUCKET_NAME,
+            Key: fileName,
+            Body: Buffer.from(fileBuffer),
+            ContentType: file.type,
+        }));
 
-    const publicUrl = `${process.env.R2_PUBLIC_URL}/${fileName}`;
+        const publicUrl = `${process.env.R2_PUBLIC_URL}/${fileName}`;
 
-    const user = await User.findByPk(userPayload.id);
-    if (user) {
-        user.photoUrl = publicUrl;
-        await user.save();
+        const user = await User.findByPk(userPayload.id);
+        if (user) {
+            user.photoUrl = publicUrl;
+            await user.save();
+        }
+        return c.json({url: publicUrl}, 200);
+    } catch (error: any) {
+        logger.error('Avatar upload failed:', error?.message ?? error);
+        const status = error?.$metadata?.httpStatusCode;
+        if (status === 401 || status === 403) {
+            return c.json({error: "Stockage non configuré. Vérifiez les credentials R2."}, 500);
+        }
+        return c.json({error: "Impossible d'uploader l'image. Réessayez."}, 500);
     }
-    return c.json({url: publicUrl}, 200);
 });
 
 protectedAuth.openapi(meRoute, async (c) => {
