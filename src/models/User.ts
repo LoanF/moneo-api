@@ -71,4 +71,13 @@ User.addHook('beforeSave', async (user: User) => {
     }
 });
 
+const SENSITIVE_FIELDS = ['password', 'refreshToken', 'emailVerificationCode',
+    'passwordResetCode', 'passwordResetExpires', 'googleId'] as const;
+
+User.prototype.toJSON = function () {
+    const values = Model.prototype.toJSON.call(this) as Record<string, unknown>;
+    for (const field of SENSITIVE_FIELDS) delete values[field];
+    return values;
+};
+
 export default User;
