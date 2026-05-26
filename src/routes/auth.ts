@@ -1,3 +1,4 @@
+import { randomInt } from 'crypto';
 import { createRouter } from '../utils/router.js';
 import {sign, verify} from 'hono/jwt';
 import {OAuth2Client} from 'google-auth-library';
@@ -23,7 +24,7 @@ const auth = createRouter();
 const protectedAuth = createRouter();
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
-const generateCode = (): string => Math.floor(100000 + Math.random() * 900000).toString();
+const generateCode = (): string => randomInt(100000, 1000000).toString();
 
 auth.use('/register', createRateLimiter(5, 10 * 60 * 1000));
 auth.use('/login', createRateLimiter(10, 15 * 60 * 1000));

@@ -105,7 +105,7 @@ describe('POST / — créer une transaction', () => {
         const mockTx = { id: TX_UUID, amount: -50, type: 'expense' };
 
         vi.mocked(Transaction.findOrCreate).mockResolvedValue([mockTx as any, true]);
-        vi.mocked(BankAccount.findByPk).mockResolvedValue(mockAccount as any);
+        vi.mocked(BankAccount.findOne).mockResolvedValue(mockAccount as any);
         vi.mocked(User.findByPk).mockResolvedValue(null);
 
         const res = await app.request('/', {
@@ -127,7 +127,7 @@ describe('POST / — créer une transaction', () => {
         const mockTx = { id: TX_UUID, amount: 200, type: 'income' };
 
         vi.mocked(Transaction.findOrCreate).mockResolvedValue([mockTx as any, true]);
-        vi.mocked(BankAccount.findByPk).mockResolvedValue(mockAccount as any);
+        vi.mocked(BankAccount.findOne).mockResolvedValue(mockAccount as any);
         vi.mocked(User.findByPk).mockResolvedValue(null);
 
         const res = await app.request('/', {
@@ -162,7 +162,7 @@ describe('POST / — créer une transaction', () => {
         vi.mocked(sequelize.transaction).mockResolvedValue(t as any);
 
         vi.mocked(Transaction.findOrCreate).mockResolvedValue([{ id: TX_UUID } as any, true]);
-        vi.mocked(BankAccount.findByPk).mockResolvedValue(null);
+        vi.mocked(BankAccount.findOne).mockResolvedValue(null);
 
         const res = await app.request('/', {
             method: 'POST',

@@ -57,7 +57,7 @@ transactions.openapi(createTransactionRoute, async (c) => {
         }
 
         // Mise à jour automatique du solde du compte
-        const account = await BankAccount.findByPk(body.accountId, { transaction: t });
+        const account = await BankAccount.findOne({ where: { id: body.accountId, userId: user.id }, transaction: t });
         if (!account) {
             await t.rollback();
             return c.json({ error: "Compte introuvable" }, 404);
