@@ -1,0 +1,115 @@
+name: Signalement d'anomalie
+description: Consigner une anomalie détectée en production ou en recette
+title: "[BUG] "
+labels: ["type:bug", "statut:a-trier"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Merci de renseigner tous les champs obligatoires.
+        Une fiche incomplète ne permet pas de reproduire l'anomalie
+        et retarde donc sa correction.
+
+  - type: input
+    id: version
+    attributes:
+      label: Version affectée
+      description: Numéro de version visible dans les paramètres de l'application, ou champ `version` de `/health`.
+      placeholder: "API v1.4.0 / App v1.6.1"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: environnement
+    attributes:
+      label: Environnement
+      options:
+        - Production
+        - Recette
+        - Développement local
+    validations:
+      required: true
+
+  - type: dropdown
+    id: composant
+    attributes:
+      label: Composant concerné
+      options:
+        - API (backend)
+        - Application mobile
+        - Base de données
+        - Chaîne CI/CD
+        - Inconnu
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severite
+    attributes:
+      label: Sévérité constatée
+      description: |
+        S1 service indisponible ou données financières erronées.
+        S2 fonctionnalité principale inutilisable, contournement possible.
+        S3 gêne fonctionnelle sans perte de donnée.
+        S4 défaut d'affichage sans impact fonctionnel.
+      options:
+        - S1 - Bloquante
+        - S2 - Majeure
+        - S3 - Mineure
+        - S4 - Cosmétique
+    validations:
+      required: true
+
+  - type: input
+    id: appareil
+    attributes:
+      label: Appareil et version d'OS
+      description: À renseigner pour toute anomalie côté application mobile.
+      placeholder: "iPhone 13, iOS 18.2"
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Étapes de reproduction
+      description: Une action par ligne, numérotée. Partir d'un état connu.
+      placeholder: |
+        1. Se connecter avec un compte disposant d'au moins une transaction
+        2. Laisser l'application inactive pendant 10 minutes
+        3. Ouvrir l'écran d'accueil
+    validations:
+      required: true
+
+  - type: textarea
+    id: attendu
+    attributes:
+      label: Comportement attendu
+    validations:
+      required: true
+
+  - type: textarea
+    id: observe
+    attributes:
+      label: Comportement observé
+    validations:
+      required: true
+
+  - type: input
+    id: frequence
+    attributes:
+      label: Fréquence
+      placeholder: "Systématique / 1 fois sur 3 / observé une seule fois"
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Journaux, captures ou trace d'appel
+      description: Sortie de `docker compose logs api`, message d'erreur, capture d'écran.
+      render: shell
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact utilisateur
+      description: Nombre d'utilisateurs concernés, contournement éventuel.

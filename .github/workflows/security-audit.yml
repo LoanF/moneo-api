@@ -1,0 +1,44 @@
+name: Audit de sécurité des dépendances
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    # Tous les lundis à 06h00 UTC, en amont du cycle Dependabot
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+jobs:
+  audit:
+    name: pnpm audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Installation des dépendances
+        run: pnpm install --frozen-lockfile
+
+      # Échoue la chaîne si une vulnérabilité haute ou critique est détectée.
+      # Seuils de remédiation : critique 24 h, haute 72 h (chapitre 2.4 du dossier).
+      - name: Audit bloquant (haute et critique)
+        run: pnpm audit --audit-level high
+
+      # Rapport complet conservé comme artefact, y compris pour les niveaux
+      # moyen et bas qui ne bloquent pas la chaîne.
+      - name: Rapport d'audit complet
+        if: always()
+        run: pnpm audit --json > audit-report.json || true
+
+      - name: Publication du rapport
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: audit-report
+          path: audit-report.json
+          retention-days: 90

@@ -1,6 +1,7 @@
 {
   "name": "moneo-api",
   "version": "1.0.0",
+  "packageManager": "pnpm@10.18.0",
   "type": "module",
   "scripts": {
     "dev": "tsx watch --inspect=0.0.0.0:9229 src/index.ts",
@@ -11,16 +12,16 @@
     "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
-    "@aws-sdk/client-s3": "^3.982.0",
+    "@aws-sdk/client-s3": "^3.1102.0",
     "@hono/node-server": "^1.19.14",
     "@hono/swagger-ui": "^0.5.3",
     "@hono/zod-openapi": "^1.2.1",
     "bcryptjs": "^3.0.3",
-    "firebase-admin": "^13.7.0",
+    "firebase-admin": "^13.10.0",
     "google-auth-library": "^10.5.0",
-    "hono": "^4.12.14",
+    "hono": "^4.12.34",
     "node-cron": "^4.2.1",
-    "nodemailer": "^8.0.5",
+    "nodemailer": "^8.0.11",
     "pg": "^8.11.3",
     "pg-hstore": "^2.3.4",
     "pino": "^9.6.0",
@@ -32,7 +33,17 @@
       "@firebase/util",
       "esbuild",
       "protobufjs"
-    ]
+    ],
+    "overrides": {
+      "protobufjs": ">=7.6.1",
+      "fast-xml-parser": ">=5.5.6",
+      "@grpc/grpc-js": ">=1.14.4",
+      "websocket-driver": ">=0.7.5",
+      "form-data": ">=2.5.6",
+      "underscore": ">=1.13.8",
+      "minimatch@9": ">=9.0.7",
+      "brace-expansion@2": ">=2.1.4"
+    }
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",

@@ -4,7 +4,7 @@ import BankAccount from '../models/BankAccount.js';
 import Category from '../models/Category.js';
 import User from '../models/User.js';
 import { authMiddleware } from '../middleware/auth.js';
-import {createTransactionRoute, listTransactionsRoute, deleteTransactionRoute, createTransferRoute, getStatsRoute, updateTransactionRoute} from '../definitions/transaction.definitions.js';
+import {createTransactionRoute, listTransactionsRoute, deleteTransactionRoute, createTransferRoute, getStatsRoute, updateTransactionRoute, batchCreateTransactionRoute} from '../definitions/transaction.definitions.js';
 import sequelize from '../config/database.js';
 import { Op, fn, col } from 'sequelize';
 import { logger } from '../utils/logger.js';
@@ -274,6 +274,68 @@ transactions.openapi(getStatsRoute, async (c) => {
         netChange: totalIncome - totalExpense,
         byCategory
     }, 200);
+});
+
+transactions.openapi(batchCreateTransactionRoute, async (c) => {
+    const user = c.get('jwtPayload');
+    const { transactions: items } = c.req.valid('json');
+    const t = await sequelize.transaction();
+
+    try {
+        // Skip already-existing IDs (idempotence)
+        const existing = await Transaction.findAll({
+            where: { id: { [Op.in]: items.map(i => i.id) }, userId: user.id },
+            attributes: ['id'],
+            transaction: t
+        });
+        const existingIds = new Set(existing.map(tx => tx.id));
+        const newItems = items.filter(i => !existingIds.has(i.id));
+
+        if (newItems.length === 0) {
+            await t.rollback();
+            return c.json({ imported: 0 }, 201);
+        }
+
+        // Verify all target accounts belong to the user
+        const accountIds = [...new Set(newItems.map(i => i.accountId))];
+        const accounts = await BankAccount.findAll({
+            where: { id: { [Op.in]: accountIds }, userId: user.id },
+            transaction: t
+        });
+        if (accounts.length !== accountIds.length) {
+            await t.rollback();
+            return c.json({ error: 'Un ou plusieurs comptes introuvables' }, 404);
+        }
+
+        // Bulk insert
+        await Transaction.bulkCreate(
+            newItems.map(item => ({
+                ...item,
+                userId: user.id,
+                date: item.date ? new Date(item.date as unknown as string) : new Date(),
+            })),
+            { transaction: t }
+        );
+
+        // Update account balances (one save per account)
+        const balanceDelta: Record<string, number> = {};
+        for (const item of newItems) {
+            balanceDelta[item.accountId] = (balanceDelta[item.accountId] ?? 0) + Number(item.amount);
+        }
+        const accountMap = Object.fromEntries(accounts.map(a => [a.id, a]));
+        for (const [accountId, delta] of Object.entries(balanceDelta)) {
+            const account = accountMap[accountId];
+            account.balance = Number(account.balance) + delta;
+            await account.save({ transaction: t });
+        }
+
+        await t.commit();
+        return c.json({ imported: newItems.length }, 201);
+    } catch (error) {
+        await t.rollback();
+        logger.error(error);
+        return c.json({ error: 'Erreur interne' }, 500);
+    }
 });
 
 transactions.openapi(updateTransactionRoute, async (c) => {
