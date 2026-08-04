@@ -27,14 +27,14 @@ importers:
         specifier: ^3.1102.0
         version: 3.1102.0
       '@hono/node-server':
-        specifier: ^1.19.14
-        version: 1.19.14(hono@4.12.34)
+        specifier: ^1.19.17
+        version: 1.19.17(hono@4.12.34)
       '@hono/swagger-ui':
-        specifier: ^0.5.3
-        version: 0.5.3(hono@4.12.34)
+        specifier: ^0.6.1
+        version: 0.6.1(hono@4.12.34)
       '@hono/zod-openapi':
-        specifier: ^1.2.1
-        version: 1.2.1(hono@4.12.34)(zod@4.3.6)
+        specifier: ^1.5.1
+        version: 1.5.1(hono@4.12.34)(zod@4.4.3)
       bcryptjs:
         specifier: ^3.0.3
         version: 3.0.3
@@ -42,20 +42,20 @@ importers:
         specifier: ^13.10.0
         version: 13.10.0
       google-auth-library:
-        specifier: ^10.5.0
-        version: 10.5.0
+        specifier: ^10.9.1
+        version: 10.9.1
       hono:
         specifier: ^4.12.34
         version: 4.12.34
       node-cron:
-        specifier: ^4.2.1
-        version: 4.2.1
+        specifier: ^4.6.0
+        version: 4.6.0
       nodemailer:
         specifier: ^9.0.4
         version: 9.0.4
       pg:
-        specifier: ^8.11.3
-        version: 8.18.0
+        specifier: ^8.22.0
+        version: 8.22.0
       pg-hstore:
         specifier: ^2.3.4
         version: 2.3.4
@@ -64,10 +64,10 @@ importers:
         version: 9.14.0
       sequelize:
         specifier: ^6.37.8
-        version: 6.37.8(pg-hstore@2.3.4)(pg@8.18.0)
+        version: 6.37.8(pg-hstore@2.3.4)(pg@8.22.0)
       zod:
-        specifier: ^4.3.6
-        version: 4.3.6
+        specifier: ^4.4.3
+        version: 4.4.3
     devDependencies:
       '@types/bcryptjs':
         specifier: ^2.4.6
@@ -83,7 +83,7 @@ importers:
         version: 6.4.23
       '@vitest/coverage-v8':
         specifier: ^3.2.7
-        version: 3.2.7(vitest@3.2.7(@types/debug@4.1.13)(@types/node@20.19.30)(esbuild@0.27.2)(tsx@4.21.0)(yaml@2.8.2))
+        version: 3.2.7(vitest@3.2.7(@types/debug@4.1.13)(@types/node@20.19.30)(esbuild@0.27.2)(tsx@4.21.0)(yaml@2.9.0))
       pino-pretty:
         specifier: ^13.0.0
         version: 13.1.3
@@ -101,7 +101,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^3.2.7
-        version: 3.2.7(@types/debug@4.1.13)(@types/node@20.19.30)(esbuild@0.27.2)(tsx@4.21.0)(yaml@2.8.2)
+        version: 3.2.7(@types/debug@4.1.13)(@types/node@20.19.30)(esbuild@0.27.2)(tsx@4.21.0)(yaml@2.9.0)
 
 packages:
 
@@ -109,8 +109,8 @@ packages:
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
     engines: {node: '>=6.0.0'}
 
-  '@asteasolutions/zod-to-openapi@8.4.0':
-    resolution: {integrity: sha512-Ckp971tmTw4pnv+o7iK85ldBHBKk6gxMaoNyLn3c2Th/fKoTG8G3jdYuOanpdGqwlDB0z01FOjry2d32lfTqrA==}
+  '@asteasolutions/zod-to-openapi@8.5.0':
+    resolution: {integrity: sha512-SABbKiObg5dLRiTFnqiW1WWwGcg1BJfmHtT2asIBnBHg6Smy/Ms2KHc650+JI4Hw7lSkdiNebEGXpwoxfben8Q==}
     peerDependencies:
       zod: ^4.0.0
 
@@ -436,28 +436,28 @@ packages:
     engines: {node: '>=6'}
     hasBin: true
 
-  '@hono/node-server@1.19.14':
-    resolution: {integrity: sha512-GwtvgtXxnWsucXvbQXkRgqksiH2Qed37H9xHZocE5sA3N8O8O8/8FA3uclQXxXVzc9XBZuEOMK7+r02FmSpHtw==}
+  '@hono/node-server@1.19.17':
+    resolution: {integrity: sha512-dSneS5qhiauZWGDCeK4o695Xd9nUNjviSZCMQrj10eetr8Uln1ucn6bbphOM6UynAMMtNIzZNSpL9vnASJwrPQ==}
     engines: {node: '>=18.14.1'}
     peerDependencies:
       hono: ^4
 
-  '@hono/swagger-ui@0.5.3':
-    resolution: {integrity: sha512-Hn90DOOJ62ICJQplQvCDVpi9Jcn6EhtRaiffyJIS53wA5RmRLtMCDQGVc0bor8vQD7JIwpkweWjs+3cycp+IvA==}
+  '@hono/swagger-ui@0.6.1':
+    resolution: {integrity: sha512-sJTvldu1GPeEPfyeLG7gRj+W4vEuD+JDi+JjJ3TJs/DvMUtBLs0KJO5yokGegWWdy5qrbdnQGekbhgNRmPmYKQ==}
     peerDependencies:
       hono: '>=4.0.0'
 
-  '@hono/zod-openapi@1.2.1':
-    resolution: {integrity: sha512-aZza4V8wkqpdHBWFNPiCeWd0cGOXbYuQW9AyezHs/jwQm5p67GkUyXwfthAooAwnG7thTpvOJkThZpCoY6us8w==}
+  '@hono/zod-openapi@1.5.1':
+    resolution: {integrity: sha512-ZaDdEIkn6PEGjIYHXJeyByg6yhvLzI+UXn968pWtahpwcQ6HMjQYXI3zNffTl0Wl9QZ79nUnGqiN1erEIu23fA==}
     engines: {node: '>=16.0.0'}
     peerDependencies:
-      hono: '>=4.3.6'
+      hono: '>=4.10.0'
       zod: ^4.0.0
 
-  '@hono/zod-validator@0.7.6':
-    resolution: {integrity: sha512-Io1B6d011Gj1KknV4rXYz4le5+5EubcWEU/speUjuw9XMMIaP3n78yXLhjd2A3PXaXaUwEAluOiAyLqhBEJgsw==}
+  '@hono/zod-validator@0.9.0':
+    resolution: {integrity: sha512-n0ZSXmCiHVIp4Y5wlOOyZCeTd/rsawA/qW1cipB8QOYKZ9N8Tk0nZUZCXho9cu374AN4JpDNKioNKBJ/W+LBug==}
     peerDependencies:
-      hono: '>=3.9.0'
+      hono: '>=4.11.2'
       zod: ^3.25.0 || ^4.0.0
 
   '@hutson/parse-repository-url@3.0.2':
@@ -902,10 +902,12 @@ packages:
   conventional-changelog-atom@2.0.8:
     resolution: {integrity: sha512-xo6v46icsFTK3bb7dY/8m2qvc8sZemRgdqLb/bjpBsH2UyOS8rKNTgcb5025Hri6IpANPApbXMg15QLb1LJpBw==}
     engines: {node: '>=10'}
+    deprecated: This preset is deprecated. Please use conventional-changelog-conventionalcommits or conventional-changelog-angular instead.
 
   conventional-changelog-codemirror@2.0.8:
     resolution: {integrity: sha512-z5DAsn3uj1Vfp7po3gpt2Boc+Bdwmw2++ZHa5Ak9k0UKsYAO5mH1UBTN0qSCuJZREIhX6WU4E1p3IW2oRCNzQw==}
     engines: {node: '>=10'}
+    deprecated: This preset is deprecated. Please use conventional-changelog-conventionalcommits or conventional-changelog-angular instead.
 
   conventional-changelog-config-spec@2.1.0:
     resolution: {integrity: sha512-IpVePh16EbbB02V+UA+HQnnPIohgXvJRxHcS5+Uwk4AT5LjzCZJm5sp/yqs5C6KZJ1jMsV4paEV13BN1pvDuxQ==}
@@ -917,26 +919,32 @@ packages:
   conventional-changelog-core@4.2.4:
     resolution: {integrity: sha512-gDVS+zVJHE2v4SLc6B0sLsPiloR0ygU7HaDW14aNJE1v4SlqJPILPl/aJC7YdtRE4CybBf8gDwObBvKha8Xlyg==}
     engines: {node: '>=10'}
+    deprecated: Deprecated and no longer maintained. Please use conventional-changelog instead.
 
   conventional-changelog-ember@2.0.9:
     resolution: {integrity: sha512-ulzIReoZEvZCBDhcNYfDIsLTHzYHc7awh+eI44ZtV5cx6LVxLlVtEmcO+2/kGIHGtw+qVabJYjdI5cJOQgXh1A==}
     engines: {node: '>=10'}
+    deprecated: This preset is deprecated. Please use conventional-changelog-conventionalcommits or conventional-changelog-angular instead.
 
   conventional-changelog-eslint@3.0.9:
     resolution: {integrity: sha512-6NpUCMgU8qmWmyAMSZO5NrRd7rTgErjrm4VASam2u5jrZS0n38V7Y9CzTtLT2qwz5xEChDR4BduoWIr8TfwvXA==}
     engines: {node: '>=10'}
+    deprecated: This preset is deprecated. Please use conventional-changelog-conventionalcommits or conventional-changelog-angular instead.
 
   conventional-changelog-express@2.0.6:
     resolution: {integrity: sha512-SDez2f3iVJw6V563O3pRtNwXtQaSmEfTCaTBPCqn0oG0mfkq0rX4hHBq5P7De2MncoRixrALj3u3oQsNK+Q0pQ==}
     engines: {node: '>=10'}
+    deprecated: This preset is deprecated. Please use conventional-changelog-conventionalcommits or conventional-changelog-angular instead.
 
   conventional-changelog-jquery@3.0.11:
     resolution: {integrity: sha512-x8AWz5/Td55F7+o/9LQ6cQIPwrCjfJQ5Zmfqi8thwUEKHstEn4kTIofXub7plf1xvFA2TqhZlq7fy5OmV6BOMw==}
     engines: {node: '>=10'}
+    deprecated: This preset is deprecated. Please use conventional-changelog-conventionalcommits or conventional-changelog-angular instead.
 
   conventional-changelog-jshint@2.0.9:
     resolution: {integrity: sha512-wMLdaIzq6TNnMHMy31hql02OEQ8nCQfExw1SE0hYL5KvU+JCTuPaDO+7JiogGT2gJAxiUGATdtYYfh+nT+6riA==}
     engines: {node: '>=10'}
+    deprecated: This preset is deprecated. Please use conventional-changelog-conventionalcommits or conventional-changelog-angular instead.
 
   conventional-changelog-preset-loader@2.3.4:
     resolution: {integrity: sha512-GEKRWkrSAZeTq5+YjUZOYxdHq+ci4dNwHvpaBC3+ENalzFWuCWa9EZXSuZBpkr72sMdKB+1fyDV4takK1Lf58g==}
@@ -1203,12 +1211,8 @@ packages:
     resolution: {integrity: sha512-LDODD4TMYx7XXdpwxAVRAIAuB0bzv0s+ywFonY46k126qzQHT9ygyoa9tncmOiQmmDrik65UYsEkv3lbfqQ3yQ==}
     engines: {node: '>=14'}
 
-  gaxios@7.1.3:
-    resolution: {integrity: sha512-YGGyuEdVIjqxkxVH1pUTMY/XtmmsApXrCVv5EU25iX6inEPbV+VakJfLealkBtJN69AQmh1eGOdCl9Sm1UP6XQ==}
-    engines: {node: '>=18'}
-
-  gaxios@7.1.4:
-    resolution: {integrity: sha512-bTIgTsM2bWn3XklZISBTQX7ZSddGW+IO3bMdGaemHZ3tbqExMENHLx6kKZ/KlejgrMtj8q7wBItt51yegqalrA==}
+  gaxios@7.3.0:
+    resolution: {integrity: sha512-RB5vLV+vvQeoFPCX4QMK6/hjVkbIamPp1QSUD0CiZcnj12qbpiL+pLbYtgD+oZkWl0tl9z+o2Utp+MpM3QRhBA==}
     engines: {node: '>=18'}
 
   gcp-metadata@6.1.1:
@@ -1242,7 +1246,7 @@ packages:
   git-raw-commits@2.0.11:
     resolution: {integrity: sha512-VnctFhw+xfj8Va1xtfEqCUD2XDrbAPSJx+hSrE5K7fGdjZruW7XV+QOrN7LF/RJyvspRiD2I0asWsxFp0ya26A==}
     engines: {node: '>=10'}
-    deprecated: This package is no longer maintained. For the JavaScript API, please use @conventional-changelog/git-client instead.
+    deprecated: Deprecated and no longer maintained. Use @conventional-changelog/git-client instead.
     hasBin: true
 
   git-remote-origin-url@2.0.0:
@@ -1252,7 +1256,7 @@ packages:
   git-semver-tags@4.1.1:
     resolution: {integrity: sha512-OWyMt5zBe7xFs8vglMmhM9lRQzCWL3WjHtxNNfJTMngGym7pC1kh8sP6jevfydJ6LP3ZvGxfb6ABYgPUM0mtsA==}
     engines: {node: '>=10'}
-    deprecated: This package is no longer maintained. For the JavaScript API, please use @conventional-changelog/git-client instead.
+    deprecated: Deprecated and no longer maintained. Use @conventional-changelog/git-client instead.
     hasBin: true
 
   gitconfiglocal@1.0.0:
@@ -1260,14 +1264,11 @@ packages:
 
   glob@10.5.0:
     resolution: {integrity: sha512-DfXN8DfhJ7NH3Oe7cFmu3NCu1wKbkReJ8TorzSAFbSKrlNaQSKfIzqYqVY8zlbs2NLBbWpRiU52GX2PbaBVNkg==}
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
     hasBin: true
 
-  google-auth-library@10.5.0:
-    resolution: {integrity: sha512-7ABviyMOlX5hIVD60YOfHw4/CxOfBhyduaYB+wbFWCWoni4N7SLcV46hrVRktuBbZjFC9ONyqamZITN7q3n32w==}
-    engines: {node: '>=18'}
-
-  google-auth-library@10.6.2:
-    resolution: {integrity: sha512-e27Z6EThmVNNvtYASwQxose/G57rkRuaRbQyxM2bvYLLX/GqWZ5chWq2EBoUchJbCc57eC9ArzO5wMsEmWftCw==}
+  google-auth-library@10.9.1:
+    resolution: {integrity: sha512-i1ydyHrqcIxXkWh/uBmVkzCvIuq5yiK2ATndIe5XxKholrG/MTYP9xGYka4sQhrbIAgGjL2B6NOE7rFaiF3fXw==}
     engines: {node: '>=18'}
 
   google-auth-library@9.15.1:
@@ -1296,10 +1297,6 @@ packages:
   gtoken@7.1.0:
     resolution: {integrity: sha512-pCcEwRi+TKpMlxAQObHDQ56KawURgyAf6jtIY046fJ5tIv3zDe/LEIubckAO8fj6JnAxLdmWkUfNyulQ2iKdEw==}
     engines: {node: '>=14.0.0'}
-
-  gtoken@8.0.0:
-    resolution: {integrity: sha512-+CqsMbHPiSTdtSO14O51eMNlrp9N79gmeqmXeouJOhfucAedHw9noVe/n5uJk3tbKE6a+6ZCQg3RPhVhHByAIw==}
-    engines: {node: '>=18'}
 
   handlebars@4.7.9:
     resolution: {integrity: sha512-4E71E0rpOaQuJR2A3xDZ+GM1HyWYv1clR58tC8emQNeQe3RH7MAzSbat+V0wG78LQBo6m6bzSG/L4pBuCsgnUQ==}
@@ -1730,9 +1727,9 @@ packages:
   neo-async@2.6.2:
     resolution: {integrity: sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==}
 
-  node-cron@4.2.1:
-    resolution: {integrity: sha512-lgimEHPE/QDgFlywTd8yTR61ptugX3Qer29efeyWw2rv259HtGBNn1vZVmp8lB9uo9wC0t/AT4iGqXxia+CJFg==}
-    engines: {node: '>=6.0.0'}
+  node-cron@4.6.0:
+    resolution: {integrity: sha512-Si/bzYiKRHOB8/a99T2+SDGN582ONDMSTlJr5oCkT6GtnqPjZ2s10eoQRYkW9ZHwjVxONL+W8Fb+qR0AHMQsdg==}
+    engines: {node: '>=20'}
 
   node-domexception@1.0.0:
     resolution: {integrity: sha512-/jKZoMpw0F8GRwl4/eLROPA3cfcXtLApP0QzLmUT/HuPCZWyB7IY9ZrMeKw2O/nFIqPQB3PVM9aYm0F312AXDQ==}
@@ -1779,8 +1776,8 @@ packages:
   once@1.4.0:
     resolution: {integrity: sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w==}
 
-  openapi3-ts@4.5.0:
-    resolution: {integrity: sha512-jaL+HgTq2Gj5jRcfdutgRGLosCy/hT8sQf6VOy+P+g36cZOjI1iukdPnijC+4CmeRzg/jEllJUboEic2FhxhtQ==}
+  openapi3-ts@4.6.1:
+    resolution: {integrity: sha512-XW9MOldkhoICNeXVzzmXzmOW5G73ppOEGmh7fLCqHjgfdEYCGGN+00MlVCeUZgovjjfC56j9tvtDt1zGabNjjA==}
 
   p-limit@1.3.0:
     resolution: {integrity: sha512-vvcXsLAJ9Dr5rQOPk7toZQZJApBl2K4J6dANSsEuh6QI41JYcsS/qhTGa9ErIUUgK3WNQoJYvylxvjqmiqEA9Q==}
@@ -1863,14 +1860,14 @@ packages:
     resolution: {integrity: sha512-//nshmD55c46FuFw26xV/xFAaB5HF9Xdap7HJBBnrKdAd6/GxDBaNA1870O79+9ueg61cZLSVc+OaFlfmObYVQ==}
     engines: {node: '>= 14.16'}
 
-  pg-cloudflare@1.3.0:
-    resolution: {integrity: sha512-6lswVVSztmHiRtD6I8hw4qP/nDm1EJbKMRhf3HCYaqud7frGysPv7FYJ5noZQdhQtN2xJnimfMtvQq21pdbzyQ==}
-
-  pg-connection-string@2.11.0:
-    resolution: {integrity: sha512-kecgoJwhOpxYU21rZjULrmrBJ698U2RxXofKVzOn5UDj61BPj/qMb7diYUR1nLScCDbrztQFl1TaQZT0t1EtzQ==}
+  pg-cloudflare@1.4.0:
+    resolution: {integrity: sha512-Vo7z/6rrQYxpNRylp4Tlob2elzbh+N/MOQbxFVWCxS7oEx6jF53GTJFxK2WWpKuBRkmiin4Mt+xofFDjx09R0A==}
 
   pg-connection-string@2.12.0:
     resolution: {integrity: sha512-U7qg+bpswf3Cs5xLzRqbXbQl85ng0mfSV/J0nnA31MCLgvEaAo7CIhmeyrmJpOr7o+zm0rXK+hNnT5l9RHkCkQ==}
+
+  pg-connection-string@2.14.0:
+    resolution: {integrity: sha512-XwWDGcLRGCXAR8F/AM5bG7Q+A3Wm2s6QeEjlOKZLlH3UYcguiqCWKyWXVag5TLTIjR7oOJUY8kcADaZgWPyLeg==}
 
   pg-hstore@2.3.4:
     resolution: {integrity: sha512-N3SGs/Rf+xA1M2/n0JBiXFDVMzdekwLZLAO0g7mpDY9ouX+fDI7jS6kTq3JujmYbtNSJ53TJ0q4G98KVZSM4EA==}
@@ -1880,20 +1877,20 @@ packages:
     resolution: {integrity: sha512-WCtabS6t3c8SkpDBUlb1kjOs7l66xsGdKpIPZsg4wR+B3+u9UAum2odSsF9tnvxg80h4ZxLWMy4pRjOsFIqQpw==}
     engines: {node: '>=4.0.0'}
 
-  pg-pool@3.11.0:
-    resolution: {integrity: sha512-MJYfvHwtGp870aeusDh+hg9apvOe2zmpZJpyt+BMtzUWlVqbhFmMK6bOBXLBUPd7iRtIF9fZplDc7KrPN3PN7w==}
+  pg-pool@3.14.0:
+    resolution: {integrity: sha512-gKtPkFdQPU3DksooVLi9LsjZxrsBUZIpa+7aVx+LV5pNh0KzP4Zleud2po+ConrxbuXGBJ6Hfer6hdgpIBpBaw==}
     peerDependencies:
       pg: '>=8.0'
 
-  pg-protocol@1.11.0:
-    resolution: {integrity: sha512-pfsxk2M9M3BuGgDOfuy37VNRRX3jmKgMjcvAcWqNDpZSf4cUmv8HSOl5ViRQFsfARFn0KuUQTgLxVMbNq5NW3g==}
+  pg-protocol@1.15.0:
+    resolution: {integrity: sha512-cq9sECI5s0+uPUXjbz8ioyPJni6RzsRib0US67i5IoTZKw8fNeYlVE7u8F4dG7vEJJtc5wdD1K189lCCUwqWTQ==}
 
   pg-types@2.2.0:
     resolution: {integrity: sha512-qTAAlrEsl8s4OiEQY69wDvcMIdQN6wdz5ojQiOy6YRMuynxenON0O5oCpJI6lshc6scgAY8qvJ2On/p+CXY0GA==}
     engines: {node: '>=4'}
 
-  pg@8.18.0:
-    resolution: {integrity: sha512-xqrUDL1b9MbkydY/s+VZ6v+xiMUmOUk7SS9d/1kpyQxoJ6U9AO1oIJyUWVZojbfe5Cc/oluutcgFG4L9RDP1iQ==}
+  pg@8.22.0:
+    resolution: {integrity: sha512-8wih1vVIBMxoUM2oB4soJsD9tDnDpLv4OXBJ+EJzFsvycD+lfyIreC2gGHq78f8jbLLt+bvlPTFdFZfJkOuzAA==}
     engines: {node: '>= 16.0.0'}
     peerDependencies:
       pg-native: '>=3.0.1'
@@ -2044,10 +2041,6 @@ packages:
   retry@0.13.1:
     resolution: {integrity: sha512-XQBQ3I8W1Cge0Seh+6gjj03LbmRFWuoszgK9ooCpwYIrhhoO80pfq4cUkU5DkknwfOfFteRwlZ56PYOGYyFWdg==}
     engines: {node: '>= 4'}
-
-  rimraf@5.0.10:
-    resolution: {integrity: sha512-l0OE8wL34P4nJH/H2ffoaniAokM2qSmrtXHmlpvYr5AVVX8msAyW0l8NVJFDxlSK4u3Uh/f41cQheDVdnYijwQ==}
-    hasBin: true
 
   rolldown@1.2.2:
     resolution: {integrity: sha512-opwpo1tQBAcpSUJDt94B7hhLNGOKjCdE//XXjeLrnx9b83bjnw45tXdg1b09yEw/VLFBJGZpwRULMmOZo7ol+A==}
@@ -2363,10 +2356,12 @@ packages:
 
   uuid@8.3.2:
     resolution: {integrity: sha512-+NYs2QeMWy+GWFOEm9xnn6HCDp0l7QBD7ml8zLUmJ+93Q5NF0NocErnwkTkXVFNiX3/fpC6afS8Dhb/gz7R7eg==}
+    deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
     hasBin: true
 
   uuid@9.0.1:
     resolution: {integrity: sha512-b+1eJOlsR9K8HJpow9Ok3fiWOWSIcIzXodvv0rQjVoOVNpWMpxf1wZNpt4y9h10odCNrqnYp1OBzRktckBe3sA==}
+    deprecated: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
     hasBin: true
 
   validate-npm-package-license@3.0.4:
@@ -2512,8 +2507,8 @@ packages:
   yallist@4.0.0:
     resolution: {integrity: sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==}
 
-  yaml@2.8.2:
-    resolution: {integrity: sha512-mplynKqc1C2hTVYxd0PU2xQAc22TI1vShAYGksCCfxbn/dFwnHTNi1bvYsBTkhdUNtGIf5xNOg938rrSSYvS9A==}
+  yaml@2.9.0:
+    resolution: {integrity: sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==}
     engines: {node: '>= 14.6'}
     hasBin: true
 
@@ -2537,8 +2532,8 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
-  zod@4.3.6:
-    resolution: {integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==}
+  zod@4.4.3:
+    resolution: {integrity: sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==}
 
 snapshots:
 
@@ -2547,10 +2542,10 @@ snapshots:
       '@jridgewell/gen-mapping': 0.3.13
       '@jridgewell/trace-mapping': 0.3.31
 
-  '@asteasolutions/zod-to-openapi@8.4.0(zod@4.3.6)':
+  '@asteasolutions/zod-to-openapi@8.5.0(zod@4.4.3)':
     dependencies:
-      openapi3-ts: 4.5.0
-      zod: 4.3.6
+      openapi3-ts: 4.6.1
+      zod: 4.4.3
 
   '@aws-sdk/checksums@3.1000.25':
     dependencies:
@@ -2929,26 +2924,26 @@ snapshots:
       yargs: 17.7.2
     optional: true
 
-  '@hono/node-server@1.19.14(hono@4.12.34)':
+  '@hono/node-server@1.19.17(hono@4.12.34)':
     dependencies:
       hono: 4.12.34
 
-  '@hono/swagger-ui@0.5.3(hono@4.12.34)':
+  '@hono/swagger-ui@0.6.1(hono@4.12.34)':
     dependencies:
       hono: 4.12.34
 
-  '@hono/zod-openapi@1.2.1(hono@4.12.34)(zod@4.3.6)':
+  '@hono/zod-openapi@1.5.1(hono@4.12.34)(zod@4.4.3)':
     dependencies:
-      '@asteasolutions/zod-to-openapi': 8.4.0(zod@4.3.6)
-      '@hono/zod-validator': 0.7.6(hono@4.12.34)(zod@4.3.6)
+      '@asteasolutions/zod-to-openapi': 8.5.0(zod@4.4.3)
+      '@hono/zod-validator': 0.9.0(hono@4.12.34)(zod@4.4.3)
       hono: 4.12.34
-      openapi3-ts: 4.5.0
-      zod: 4.3.6
+      openapi3-ts: 4.6.1
+      zod: 4.4.3
 
-  '@hono/zod-validator@0.7.6(hono@4.12.34)(zod@4.3.6)':
+  '@hono/zod-validator@0.9.0(hono@4.12.34)(zod@4.4.3)':
     dependencies:
       hono: 4.12.34
-      zod: 4.3.6
+      zod: 4.4.3
 
   '@hutson/parse-repository-url@3.0.2': {}
 
@@ -3130,7 +3125,7 @@ snapshots:
 
   '@types/validator@13.15.10': {}
 
-  '@vitest/coverage-v8@3.2.7(vitest@3.2.7(@types/debug@4.1.13)(@types/node@20.19.30)(esbuild@0.27.2)(tsx@4.21.0)(yaml@2.8.2))':
+  '@vitest/coverage-v8@3.2.7(vitest@3.2.7(@types/debug@4.1.13)(@types/node@20.19.30)(esbuild@0.27.2)(tsx@4.21.0)(yaml@2.9.0))':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@bcoe/v8-coverage': 1.0.2
@@ -3145,7 +3140,7 @@ snapshots:
       std-env: 3.10.0
       test-exclude: 7.0.2
       tinyrainbow: 2.0.0
-      vitest: 3.2.7(@types/debug@4.1.13)(@types/node@20.19.30)(esbuild@0.27.2)(tsx@4.21.0)(yaml@2.8.2)
+      vitest: 3.2.7(@types/debug@4.1.13)(@types/node@20.19.30)(esbuild@0.27.2)(tsx@4.21.0)(yaml@2.9.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -3157,13 +3152,13 @@ snapshots:
       chai: 5.3.3
       tinyrainbow: 2.0.0
 
-  '@vitest/mocker@3.2.7(vite@8.2.0(@types/node@20.19.30)(esbuild@0.27.2)(tsx@4.21.0)(yaml@2.8.2))':
+  '@vitest/mocker@3.2.7(vite@8.2.0(@types/node@20.19.30)(esbuild@0.27.2)(tsx@4.21.0)(yaml@2.9.0))':
     dependencies:
       '@vitest/spy': 3.2.7
       estree-walker: 3.0.3
       magic-string: 0.30.21
     optionalDependencies:
-      vite: 8.2.0(@types/node@20.19.30)(esbuild@0.27.2)(tsx@4.21.0)(yaml@2.8.2)
+      vite: 8.2.0(@types/node@20.19.30)(esbuild@0.27.2)(tsx@4.21.0)(yaml@2.9.0)
 
   '@vitest/pretty-format@3.2.7':
     dependencies:
@@ -3699,7 +3694,7 @@ snapshots:
       '@firebase/database-types': 1.0.18
       farmhash-modern: 1.1.0
       fast-deep-equal: 3.1.3
-      google-auth-library: 10.6.2
+      google-auth-library: 10.9.1
       jsonwebtoken: 9.0.3
       jwks-rsa: 3.2.2
     optionalDependencies:
@@ -3754,16 +3749,7 @@ snapshots:
       - supports-color
     optional: true
 
-  gaxios@7.1.3:
-    dependencies:
-      extend: 3.0.2
-      https-proxy-agent: 7.0.6
-      node-fetch: 3.3.2
-      rimraf: 5.0.10
-    transitivePeerDependencies:
-      - supports-color
-
-  gaxios@7.1.4:
+  gaxios@7.3.0:
     dependencies:
       extend: 3.0.2
       https-proxy-agent: 7.0.6
@@ -3783,7 +3769,7 @@ snapshots:
 
   gcp-metadata@8.1.2:
     dependencies:
-      gaxios: 7.1.3
+      gaxios: 7.3.0
       google-logging-utils: 1.1.3
       json-bigint: 1.0.0
     transitivePeerDependencies:
@@ -3853,23 +3839,11 @@ snapshots:
       package-json-from-dist: 1.0.1
       path-scurry: 1.11.1
 
-  google-auth-library@10.5.0:
+  google-auth-library@10.9.1:
     dependencies:
       base64-js: 1.5.1
       ecdsa-sig-formatter: 1.0.11
-      gaxios: 7.1.3
-      gcp-metadata: 8.1.2
-      google-logging-utils: 1.1.3
-      gtoken: 8.0.0
-      jws: 4.0.1
-    transitivePeerDependencies:
-      - supports-color
-
-  google-auth-library@10.6.2:
-    dependencies:
-      base64-js: 1.5.1
-      ecdsa-sig-formatter: 1.0.11
-      gaxios: 7.1.4
+      gaxios: 7.3.0
       gcp-metadata: 8.1.2
       google-logging-utils: 1.1.3
       jws: 4.0.1
@@ -3926,13 +3900,6 @@ snapshots:
       - encoding
       - supports-color
     optional: true
-
-  gtoken@8.0.0:
-    dependencies:
-      gaxios: 7.1.3
-      jws: 4.0.1
-    transitivePeerDependencies:
-      - supports-color
 
   handlebars@4.7.9:
     dependencies:
@@ -4343,7 +4310,7 @@ snapshots:
 
   neo-async@2.6.2: {}
 
-  node-cron@4.2.1: {}
+  node-cron@4.6.0: {}
 
   node-domexception@1.0.0: {}
 
@@ -4387,9 +4354,9 @@ snapshots:
     dependencies:
       wrappy: 1.0.2
 
-  openapi3-ts@4.5.0:
+  openapi3-ts@4.6.1:
     dependencies:
-      yaml: 2.8.2
+      yaml: 2.9.0
 
   p-limit@1.3.0:
     dependencies:
@@ -4461,12 +4428,12 @@ snapshots:
 
   pathval@2.0.1: {}
 
-  pg-cloudflare@1.3.0:
+  pg-cloudflare@1.4.0:
     optional: true
 
-  pg-connection-string@2.11.0: {}
-
   pg-connection-string@2.12.0: {}
+
+  pg-connection-string@2.14.0: {}
 
   pg-hstore@2.3.4:
     dependencies:
@@ -4474,11 +4441,11 @@ snapshots:
 
   pg-int8@1.0.1: {}
 
-  pg-pool@3.11.0(pg@8.18.0):
+  pg-pool@3.14.0(pg@8.22.0):
     dependencies:
-      pg: 8.18.0
+      pg: 8.22.0
 
-  pg-protocol@1.11.0: {}
+  pg-protocol@1.15.0: {}
 
   pg-types@2.2.0:
     dependencies:
@@ -4488,15 +4455,15 @@ snapshots:
       postgres-date: 1.0.7
       postgres-interval: 1.2.0
 
-  pg@8.18.0:
+  pg@8.22.0:
     dependencies:
-      pg-connection-string: 2.11.0
-      pg-pool: 3.11.0(pg@8.18.0)
-      pg-protocol: 1.11.0
+      pg-connection-string: 2.14.0
+      pg-pool: 3.14.0(pg@8.22.0)
+      pg-protocol: 1.15.0
       pg-types: 2.2.0
       pgpass: 1.0.5
     optionalDependencies:
-      pg-cloudflare: 1.3.0
+      pg-cloudflare: 1.4.0
 
   pgpass@1.0.5:
     dependencies:
@@ -4665,10 +4632,6 @@ snapshots:
   retry@0.13.1:
     optional: true
 
-  rimraf@5.0.10:
-    dependencies:
-      glob: 10.5.0
-
   rolldown@1.2.2:
     dependencies:
       '@oxc-project/types': 0.142.0
@@ -4717,7 +4680,7 @@ snapshots:
 
   sequelize-pool@7.1.0: {}
 
-  sequelize@6.37.8(pg-hstore@2.3.4)(pg@8.18.0):
+  sequelize@6.37.8(pg-hstore@2.3.4)(pg@8.22.0):
     dependencies:
       '@types/debug': 4.1.13
       '@types/validator': 13.15.10
@@ -4736,7 +4699,7 @@ snapshots:
       validator: 13.15.35
       wkx: 0.5.0
     optionalDependencies:
-      pg: 8.18.0
+      pg: 8.22.0
       pg-hstore: 2.3.4
     transitivePeerDependencies:
       - supports-color
@@ -4980,13 +4943,13 @@ snapshots:
 
   validator@13.15.35: {}
 
-  vite-node@3.2.4(@types/node@20.19.30)(esbuild@0.27.2)(tsx@4.21.0)(yaml@2.8.2):
+  vite-node@3.2.4(@types/node@20.19.30)(esbuild@0.27.2)(tsx@4.21.0)(yaml@2.9.0):
     dependencies:
       cac: 6.7.14
       debug: 4.4.3
       es-module-lexer: 1.7.0
       pathe: 2.0.3
-      vite: 8.2.0(@types/node@20.19.30)(esbuild@0.27.2)(tsx@4.21.0)(yaml@2.8.2)
+      vite: 8.2.0(@types/node@20.19.30)(esbuild@0.27.2)(tsx@4.21.0)(yaml@2.9.0)
     transitivePeerDependencies:
       - '@types/node'
       - '@vitejs/devtools'
@@ -5002,7 +4965,7 @@ snapshots:
       - tsx
       - yaml
 
-  vite@8.2.0(@types/node@20.19.30)(esbuild@0.27.2)(tsx@4.21.0)(yaml@2.8.2):
+  vite@8.2.0(@types/node@20.19.30)(esbuild@0.27.2)(tsx@4.21.0)(yaml@2.9.0):
     dependencies:
       lightningcss: 1.33.0
       picomatch: 4.0.5
@@ -5014,13 +4977,13 @@ snapshots:
       esbuild: 0.27.2
       fsevents: 2.3.3
       tsx: 4.21.0
-      yaml: 2.8.2
+      yaml: 2.9.0
 
-  vitest@3.2.7(@types/debug@4.1.13)(@types/node@20.19.30)(esbuild@0.27.2)(tsx@4.21.0)(yaml@2.8.2):
+  vitest@3.2.7(@types/debug@4.1.13)(@types/node@20.19.30)(esbuild@0.27.2)(tsx@4.21.0)(yaml@2.9.0):
     dependencies:
       '@types/chai': 5.2.3
       '@vitest/expect': 3.2.7
-      '@vitest/mocker': 3.2.7(vite@8.2.0(@types/node@20.19.30)(esbuild@0.27.2)(tsx@4.21.0)(yaml@2.8.2))
+      '@vitest/mocker': 3.2.7(vite@8.2.0(@types/node@20.19.30)(esbuild@0.27.2)(tsx@4.21.0)(yaml@2.9.0))
       '@vitest/pretty-format': 3.2.7
       '@vitest/runner': 3.2.7
       '@vitest/snapshot': 3.2.7
@@ -5038,8 +5001,8 @@ snapshots:
       tinyglobby: 0.2.15
       tinypool: 1.1.1
       tinyrainbow: 2.0.0
-      vite: 8.2.0(@types/node@20.19.30)(esbuild@0.27.2)(tsx@4.21.0)(yaml@2.8.2)
-      vite-node: 3.2.4(@types/node@20.19.30)(esbuild@0.27.2)(tsx@4.21.0)(yaml@2.8.2)
+      vite: 8.2.0(@types/node@20.19.30)(esbuild@0.27.2)(tsx@4.21.0)(yaml@2.9.0)
+      vite-node: 3.2.4(@types/node@20.19.30)(esbuild@0.27.2)(tsx@4.21.0)(yaml@2.9.0)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/debug': 4.1.13
@@ -5116,7 +5079,7 @@ snapshots:
 
   yallist@4.0.0: {}
 
-  yaml@2.8.2: {}
+  yaml@2.9.0: {}
 
   yargs-parser@20.2.9: {}
 
@@ -5146,4 +5109,4 @@ snapshots:
 
   yocto-queue@0.1.0: {}
 
-  zod@4.3.6: {}
+  zod@4.4.3: {}
