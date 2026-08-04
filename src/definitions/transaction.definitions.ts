@@ -1,5 +1,5 @@
 import {createRoute, z} from '@hono/zod-openapi';
-import {TransactionResponseSchema, CreateTransactionSchema, CreateTransferSchema} from '../schemas/transaction.schema.js';
+import {TransactionResponseSchema, CreateTransactionSchema, CreateTransferSchema, BatchCreateTransactionSchema} from '../schemas/transaction.schema.js';
 import {ErrorSchema} from '../schemas/auth.schema.js';
 import {GlobalStatsSchema} from "../schemas/statistics.schema.js";
 
@@ -114,6 +114,24 @@ export const getStatsRoute = createRoute({
             content: { 'application/json': { schema: GlobalStatsSchema } },
             description: 'Statistiques calculées'
         }
+    }
+});
+
+export const batchCreateTransactionRoute = createRoute({
+    method: 'post',
+    path: '/batch',
+    summary: 'Importer des transactions en masse',
+    description: 'Insère un lot de transactions en une seule opération atomique et met à jour les soldes des comptes concernés. Les doublons (même ID) sont ignorés.',
+    tags: ['Transactions'],
+    security: [{ Bearer: [] }],
+    request: { body: { content: { 'application/json': { schema: BatchCreateTransactionSchema } } } },
+    responses: {
+        201: {
+            content: { 'application/json': { schema: z.object({ imported: z.number() }) } },
+            description: 'Transactions importées avec succès'
+        },
+        404: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Compte introuvable' },
+        500: { content: { 'application/json': { schema: ErrorSchema } }, description: 'Erreur interne' }
     }
 });
 

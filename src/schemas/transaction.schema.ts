@@ -26,6 +26,10 @@ export const CreateTransactionSchema = z.object({
     isChecked: z.boolean().optional().default(false)
 }).openapi('CreateTransactionInput');
 
+export const BatchCreateTransactionSchema = z.object({
+    transactions: CreateTransactionSchema.array().min(1).max(1000),
+}).openapi('BatchCreateTransactionInput');
+
 export const CreateTransferSchema = z.object({
     fromAccountId: z.uuid(),
     toAccountId: z.uuid(),

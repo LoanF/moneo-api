@@ -1,0 +1,58 @@
+version: 2
+updates:
+  # ---------------------------------------------------------------
+  # Dépendances npm de l'API
+  # ---------------------------------------------------------------
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "Europe/Paris"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(deps)"
+      prefix-development: "chore(deps-dev)"
+    labels:
+      - "type:dependances"
+    groups:
+      # Une seule PR hebdomadaire pour les mineures et patchs de production
+      production-minor-patch:
+        dependency-type: "production"
+        update-types:
+          - "minor"
+          - "patch"
+      # Une seule PR pour tout l'outillage de développement
+      development-all:
+        dependency-type: "development"
+    ignore:
+      # Les majeures sont traitées hors cycle, trimestriellement,
+      # après étude d'impact. Voir chapitre 2.3 du dossier.
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # ---------------------------------------------------------------
+  # Images de base des conteneurs
+  # ---------------------------------------------------------------
+  - package-ecosystem: "docker"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    commit-message:
+      prefix: "chore(docker)"
+    labels:
+      - "type:dependances"
+
+  # ---------------------------------------------------------------
+  # Actions de la chaîne CI/CD
+  # ---------------------------------------------------------------
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "monthly"
+    commit-message:
+      prefix: "ci(deps)"
+    labels:
+      - "type:dependances"
