@@ -7,6 +7,7 @@ import User from '../models/User.js';
 import sequelize from '../config/database.js';
 import { logger } from '../utils/logger.js';
 import { sendPushNotification } from './fcmService.js';
+import { notifyHeartbeat } from './scheduler.js';
 
 export const processMonthlyPayments = async () => {
     const today = new Date();
@@ -71,6 +72,8 @@ export const processMonthlyPayments = async () => {
             logger.error(error, `Échec opération mensuelle ${payment.name}`);
         }
     }
+
+    await notifyHeartbeat('up', `Traitements planifiés exécutés : ${pendingPayments.length} paiement(s)`);
 };
 
 // Planification : S'exécute tous les jours à 00:01
