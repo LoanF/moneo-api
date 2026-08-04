@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.4.7](https://github.com/LoanF/moneo-api/compare/v1.4.6...v1.4.7) (2026-08-04)
+
+
+### Bug Fixes
+
+* **ci:** remove pnpm version pin conflicting with packageManager field ([7fb4aaa](https://github.com/LoanF/moneo-api/commit/7fb4aaab2db777445e64a812d1fedf482dc91dab))
+* **deps:** bump vitest and nodemailer, add overrides for transitive vulnerable packages ([07a65c1](https://github.com/LoanF/moneo-api/commit/07a65c1bff6ddfb05a51d4bf53fd1b9127e2cda7))
+* **deps:** sync pnpm-lock.yaml with pnpm.overrides in package.json ([c5e50cf](https://github.com/LoanF/moneo-api/commit/c5e50cf8d08ff04224f2a40f0cafed32baafea70))
+
 ### [1.4.6](https://github.com/LoanF/moneo-api/compare/v1.4.5...v1.4.6) (2026-07-28)
 
 ### [1.4.5](https://github.com/LoanF/moneo-api/compare/v1.4.4...v1.4.5) (2026-05-26)
