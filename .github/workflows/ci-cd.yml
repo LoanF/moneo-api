@@ -109,6 +109,7 @@ jobs:
           R2_BUCKET_NAME=${{ secrets.R2_BUCKET_NAME }}
           R2_PUBLIC_URL=${{ secrets.R2_PUBLIC_URL }}
           FIREBASE_SERVICE_ACCOUNT='${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+          UPTIME_PUSH_URL=${{ secrets.UPTIME_PUSH_URL }}
           EOF
 
       - name: Déployer avec Docker Compose
