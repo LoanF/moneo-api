@@ -140,6 +140,20 @@ v1.openAPIRegistry.registerComponent('securitySchemes', 'Bearer', {
 
 app.route('/api/v1', v1);
 
+app.onError((err, c) => {
+    logger.error(err, 'Erreur non interceptée');
+    return c.json({ error: 'Une erreur interne est survenue' }, 500);
+});
+
+process.on('uncaughtException', (err) => {
+    logger.error(err, 'Exception non interceptée');
+    process.exit(1);
+});
+
+process.on('unhandledRejection', (reason) => {
+    logger.error(reason, 'Promesse rejetée non interceptée');
+});
+
 // --- LOGIQUE SEQUELIZE & START ---
 
 const emitChange = (type: string, instance: any) => {
