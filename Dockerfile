@@ -1,4 +1,4 @@
-FROM node:20-alpine AS base
+FROM node:26-alpine AS base
 WORKDIR /usr/src/app
 RUN npm config set strict-ssl false
 RUN npm install -g pnpm
@@ -15,7 +15,7 @@ FROM base AS builder
 COPY . .
 RUN pnpm run build
 
-FROM node:20-alpine AS production
+FROM node:26-alpine AS production
 WORKDIR /usr/src/app
 RUN npm install -g pnpm
 COPY --from=builder /usr/src/app/dist ./dist
