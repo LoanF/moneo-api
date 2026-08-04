@@ -16,7 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - uses: pnpm/action-setup@v6
+      - uses: pnpm/action-setup@v5
 
       - uses: actions/setup-node@v6
         with:
@@ -52,7 +52,7 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: pnpm/action-setup@v6
+      - uses: pnpm/action-setup@v5
 
       - name: Installer les dépendances
         run: pnpm install --frozen-lockfile
