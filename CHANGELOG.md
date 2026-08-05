@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.4.11](https://github.com/LoanF/moneo-api/compare/v1.4.10...v1.4.11) (2026-08-05)
+
+
+### Bug Fixes
+
+* **docker:** pin pnpm version to avoid Alpine delegation bug ([b45b8ff](https://github.com/LoanF/moneo-api/commit/b45b8ff4678e84f728028fc49e0f7c6dc22476ea)), closes [pnpm/pnpm#13622](https://github.com/pnpm/pnpm/issues/13622)
+
 ### [1.4.10](https://github.com/LoanF/moneo-api/compare/v1.4.7...v1.4.10) (2026-08-05)
 
 ### [1.4.9](https://github.com/LoanF/moneo-api/compare/v1.4.7...v1.4.9) (2026-08-04)
