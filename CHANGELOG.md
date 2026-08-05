@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.4.12](https://github.com/LoanF/moneo-api/compare/v1.4.11...v1.4.12) (2026-08-05)
+
+
+### Bug Fixes
+
+* **sequelize:** convert .sequelizerc to ESM syntax ([351f286](https://github.com/LoanF/moneo-api/commit/351f2866ae0cb4bd45187ebc9943d299670f03aa))
+
 ### [1.4.11](https://github.com/LoanF/moneo-api/compare/v1.4.10...v1.4.11) (2026-08-05)
 
 
