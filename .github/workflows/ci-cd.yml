@@ -13,6 +13,26 @@ jobs:
   check:
     name: Vérification & Tests
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: moneo_test
+          POSTGRES_PASSWORD: moneo_test
+          POSTGRES_DB: moneo_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U moneo_test -d moneo_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      POSTGRES_USER: moneo_test
+      POSTGRES_PASSWORD: moneo_test
+      POSTGRES_DB: moneo_test
+      DB_HOST: localhost
+      DB_PORT: 5432
     steps:
       - uses: actions/checkout@v7
 
@@ -109,6 +129,8 @@ jobs:
           R2_BUCKET_NAME=${{ secrets.R2_BUCKET_NAME }}
           R2_PUBLIC_URL=${{ secrets.R2_PUBLIC_URL }}
           FIREBASE_SERVICE_ACCOUNT='${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+          UPTIME_PUSH_URL=${{ secrets.UPTIME_PUSH_URL }}
+          SENTRY_DSN=${{ secrets.SENTRY_DSN }}
           EOF
 
       - name: Déployer avec Docker Compose

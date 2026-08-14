@@ -32,10 +32,15 @@ vi.mock('./fcmService.js', () => ({
     sendPushNotification: vi.fn(),
 }));
 
+vi.mock('./scheduler.js', () => ({
+    notifyHeartbeat: vi.fn(),
+}));
+
 import MonthlyPayment from '../models/MonthlyPayment.js';
 import Transaction from '../models/Transaction.js';
 import BankAccount from '../models/BankAccount.js';
 import sequelize from '../config/database.js';
+import { notifyHeartbeat } from './scheduler.js';
 import { processMonthlyPayments } from './monthlyProcessor.js';
 
 describe('processMonthlyPayments', () => {
@@ -52,6 +57,12 @@ describe('processMonthlyPayments', () => {
         vi.mocked(MonthlyPayment.findAll).mockResolvedValue([]);
         await processMonthlyPayments();
         expect(Transaction.create).not.toHaveBeenCalled();
+    });
+
+    it('signale un heartbeat "up" à la fin du traitement', async () => {
+        vi.mocked(MonthlyPayment.findAll).mockResolvedValue([]);
+        await processMonthlyPayments();
+        expect(notifyHeartbeat).toHaveBeenCalledWith('up', expect.any(String));
     });
 
     it('paiement de type "expense" → balance décrémentée', async () => {
