@@ -2,6 +2,43 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.4.16](https://github.com/LoanF/moneo-api/compare/v1.4.15...v1.4.16) (2026-08-12)
+
+### [1.4.15](https://github.com/LoanF/moneo-api/compare/v1.4.14...v1.4.15) (2026-08-06)
+
+### [1.4.14](https://github.com/LoanF/moneo-api/compare/v1.4.13...v1.4.14) (2026-08-05)
+
+### [1.4.13](https://github.com/LoanF/moneo-api/compare/v1.4.12...v1.4.13) (2026-08-05)
+
+### [1.4.12](https://github.com/LoanF/moneo-api/compare/v1.4.11...v1.4.12) (2026-08-05)
+
+
+### Bug Fixes
+
+* **sequelize:** convert .sequelizerc to ESM syntax ([351f286](https://github.com/LoanF/moneo-api/commit/351f2866ae0cb4bd45187ebc9943d299670f03aa))
+
+### [1.4.11](https://github.com/LoanF/moneo-api/compare/v1.4.10...v1.4.11) (2026-08-05)
+
+
+### Bug Fixes
+
+* **docker:** pin pnpm version to avoid Alpine delegation bug ([b45b8ff](https://github.com/LoanF/moneo-api/commit/b45b8ff4678e84f728028fc49e0f7c6dc22476ea)), closes [pnpm/pnpm#13622](https://github.com/pnpm/pnpm/issues/13622)
+
+### [1.4.10](https://github.com/LoanF/moneo-api/compare/v1.4.7...v1.4.10) (2026-08-05)
+
+### [1.4.9](https://github.com/LoanF/moneo-api/compare/v1.4.7...v1.4.9) (2026-08-04)
+
+### [1.4.8](https://github.com/LoanF/moneo-api/compare/v1.4.7...v1.4.8) (2026-08-04)
+
+### [1.4.7](https://github.com/LoanF/moneo-api/compare/v1.4.6...v1.4.7) (2026-08-04)
+
+
+### Bug Fixes
+
+* **ci:** remove pnpm version pin conflicting with packageManager field ([7fb4aaa](https://github.com/LoanF/moneo-api/commit/7fb4aaab2db777445e64a812d1fedf482dc91dab))
+* **deps:** bump vitest and nodemailer, add overrides for transitive vulnerable packages ([07a65c1](https://github.com/LoanF/moneo-api/commit/07a65c1bff6ddfb05a51d4bf53fd1b9127e2cda7))
+* **deps:** sync pnpm-lock.yaml with pnpm.overrides in package.json ([c5e50cf](https://github.com/LoanF/moneo-api/commit/c5e50cf8d08ff04224f2a40f0cafed32baafea70))
+
 ### [1.4.6](https://github.com/LoanF/moneo-api/compare/v1.4.5...v1.4.6) (2026-07-28)
 
 ### [1.4.5](https://github.com/LoanF/moneo-api/compare/v1.4.4...v1.4.5) (2026-05-26)

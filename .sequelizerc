@@ -1,7 +1,9 @@
-const path = require('path');
+import path from 'node:path';
 
-module.exports = {
+const config = {
     'config': path.resolve('config', 'database.cjs'),
     'migrations-path': path.resolve('migrations'),
     'models-path': path.resolve('src', 'models'),
 };
+
+export { config as 'module.exports' };
