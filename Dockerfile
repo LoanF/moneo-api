@@ -20,6 +20,9 @@ WORKDIR /usr/src/app
 RUN npm install -g pnpm@10.18.0
 COPY --from=builder /usr/src/app/dist ./dist
 COPY --from=builder /usr/src/app/assets ./assets
+COPY --from=builder /usr/src/app/migrations ./migrations
+COPY --from=builder /usr/src/app/config ./config
+COPY --from=builder /usr/src/app/.sequelizerc ./.sequelizerc
 COPY --from=builder /usr/src/app/package.json /usr/src/app/pnpm-lock.yaml ./
 RUN pnpm install --prod --frozen-lockfile
 EXPOSE 3000
