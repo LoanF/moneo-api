@@ -21,20 +21,15 @@ services:
   api:
     build:
       context: .
-      target: development
+      target: production
     container_name: moneo_api
-    command: pnpm run dev
     ports:
       - "3000:3000"
-      - "9229:9229"
     depends_on:
       db:
         condition: service_healthy
     env_file:
       - .env
-    volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
     environment:
       - NODE_ENV=development
       - DATABASE_URL=postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
