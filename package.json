@@ -22,7 +22,7 @@
     "google-auth-library": "^10.9.1",
     "hono": "^4.13.3",
     "node-cron": "^4.6.0",
-    "nodemailer": "^9.0.5",
+    "nodemailer": "^9.1.1",
     "pg": "^8.22.0",
     "pg-hstore": "^2.3.4",
     "pino": "^9.6.0",
