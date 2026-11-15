@@ -1,8 +1,9 @@
 import { z } from 'zod';
 
+// Une variable vide (ex. `TRUST_PROXY=` écrite par le CI quand la variable GitHub n'est pas définie)
+// est traitée comme absente → false.
 const bool = z
-    .enum(['true', 'false', '1', '0'])
-    .optional()
+    .preprocess((v) => (typeof v === 'string' && v.trim() === '' ? undefined : v), z.enum(['true', 'false', '1', '0']).optional())
     .transform((v) => v === 'true' || v === '1');
 
 const schema = z.object({
