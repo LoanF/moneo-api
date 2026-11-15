@@ -9,6 +9,12 @@
 # deps
 node_modules/
 
+# build
+dist/
+
+# tests
+coverage/
+
 # env
 .env
 .env.production

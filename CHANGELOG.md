@@ -2,6 +2,37 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.5.8](https://github.com/LoanF/moneo-api/compare/v1.5.7...v1.5.8) (2026-11-12)
+
+### [1.5.7](https://github.com/LoanF/moneo-api/compare/v1.5.6...v1.5.7) (2026-10-16)
+
+### [1.5.6](https://github.com/LoanF/moneo-api/compare/v1.5.5...v1.5.6) (2026-09-13)
+
+### [1.5.5](https://github.com/LoanF/moneo-api/compare/v1.5.4...v1.5.5) (2026-08-26)
+
+### [1.5.4](https://github.com/LoanF/moneo-api/compare/v1.5.3...v1.5.4) (2026-08-21)
+
+### [1.5.3](https://github.com/LoanF/moneo-api/compare/v1.5.2...v1.5.3) (2026-08-14)
+
+
+### Bug Fixes
+
+* **deploy:** use production Docker stage, fix start script path ([fbfa13d](https://github.com/LoanF/moneo-api/commit/fbfa13dbcc3f3fe6e685e4f512c72f30c74413e0))
+
+### [1.5.2](https://github.com/LoanF/moneo-api/compare/v1.5.1...v1.5.2) (2026-08-14)
+
+### [1.5.1](https://github.com/LoanF/moneo-api/compare/v1.5.0...v1.5.1) (2026-08-14)
+
+## [1.5.0](https://github.com/LoanF/moneo-api/compare/v1.4.17...v1.5.0) (2026-08-14)
+
+
+### Features
+
+* **observability:** integrate Sentry for backend error tracking ([0b20635](https://github.com/LoanF/moneo-api/commit/0b206355105420415bc4bdbc63d5d19757001548))
+* **scheduler:** push heartbeat to Uptime Kuma after daily processing ([00bd029](https://github.com/LoanF/moneo-api/commit/00bd029ca2cb85f5fbe796de9686f57072d95484))
+
+### [1.4.17](https://github.com/LoanF/moneo-api/compare/v1.4.16...v1.4.17) (2026-08-14)
+
 ### [1.4.16](https://github.com/LoanF/moneo-api/compare/v1.4.15...v1.4.16) (2026-08-12)
 
 ### [1.4.15](https://github.com/LoanF/moneo-api/compare/v1.4.14...v1.4.15) (2026-08-06)

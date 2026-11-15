@@ -1,0 +1,22 @@
+# Usage local uniquement, en plus du compose de base :
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+#
+# Bascule le service api sur le stage "development" du Dockerfile (hot-reload
+# via tsx watch, inspecteur Node exposé) et publie la base sur l'hôte.
+# Jamais utilisé en déploiement : la CI n'appelle que "docker compose up".
+services:
+  db:
+    ports:
+      - "5432:5432"
+
+  api:
+    build:
+      target: development
+    command: sh -c "pnpm migrate && pnpm run dev"
+    environment:
+      - NODE_ENV=development
+    ports:
+      - "9229:9229"
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
