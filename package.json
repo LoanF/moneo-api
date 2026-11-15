@@ -23,7 +23,7 @@
     "fflate": "^0.8.3",
     "firebase-admin": "^13.10.0",
     "google-auth-library": "^10.9.1",
-    "hono": "^4.13.3",
+    "hono": "^4.13.16",
     "node-cron": "^4.6.0",
     "pg": "^8.22.0",
     "pg-hstore": "^2.3.4",
