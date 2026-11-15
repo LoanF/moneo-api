@@ -1,221 +1,44 @@
-import {serve} from '@hono/node-server';
-import { serveStatic } from '@hono/node-server/serve-static'
-import {OpenAPIHono} from '@hono/zod-openapi';
-import {logger as honoLogger} from 'hono/logger';
-import {cors} from 'hono/cors';
-import {logger} from './utils/logger.js';
-import {swaggerUI} from '@hono/swagger-ui';
-import {streamSSE} from 'hono/streaming';
-import {EventEmitter} from 'node:events';
+import { serve } from '@hono/node-server';
+import { createApp } from './app.js';
 import sequelize from './config/database.js';
-import type { AppEnv } from './types.js';
-import {authMiddleware} from './middleware/auth.js';
-import {securityHeaders} from './middleware/securityHeaders.js';
-import {processMonthlyPayments} from './services/monthlyProcessor.js';
-import {initFirebase} from './services/fcmService.js';
-import './services/notificationScheduler.js';
+import { env } from './config/env.js';
+import { logger } from './lib/logger.js';
+import { runRecurringJob, startJobs } from './services/jobs.js';
+import { initPush } from './services/push.js';
+import { settleSideEffects } from './services/transactions.js';
 
-import pkg from '../package.json' with {type: 'json'};
+const start = async () => {
+    try {
+        // Le schéma est géré exclusivement par les migrations (`pnpm migrate`), jamais par sync().
+        await sequelize.authenticate();
+    } catch (error) {
+        logger.error(error, 'Connexion à la base de données impossible');
+        process.exit(1);
+    }
 
-// Routes
-import authRoutes from './routes/auth.js';
-import accountRoutes from './routes/bankAccount.js';
-import categoryRoutes from './routes/category.js';
-import paymentMethodRoutes from './routes/paymentMethod.js';
-import monthlyPaymentRoutes from './routes/monthlyPayment.js';
-import transactionRoutes from './routes/transaction.js';
+    await initPush();
+    const server = serve({ fetch: createApp().fetch, port: env.PORT });
+    logger.info(`Moneo API à l'écoute sur le port ${env.PORT}`);
 
-// Models Sequelize
-import './models/User.js';
-import './models/BankAccount.js';
-import './models/Category.js';
-import './models/PaymentMethod.js';
-import './models/MonthlyPayment.js';
-import './models/Transaction.js';
+    startJobs();
+    // Rattrapage au démarrage : si le serveur était arrêté à minuit, les mensualités ne sont pas perdues.
+    void runRecurringJob();
 
-const app = new OpenAPIHono<AppEnv>();
-const eventBus = new EventEmitter();
-eventBus.setMaxListeners(1000);
+    const shutdown = async (signal: string) => {
+        logger.info(`${signal} reçu, arrêt en cours`);
+        server.close();
+        await settleSideEffects();
+        await sequelize.close();
+        process.exit(0);
+    };
+    process.on('SIGTERM', () => void shutdown('SIGTERM'));
+    process.on('SIGINT', () => void shutdown('SIGINT'));
+};
 
-const port = Number(process.env.PORT) || 3000;
-
-app.use('*', securityHeaders);
-app.use('*', honoLogger());
-app.use('*', cors({
-    origin: (process.env.ALLOWED_ORIGINS || '*').split(','),
-    allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowHeaders: ['Content-Type', 'Authorization'],
-    exposeHeaders: ['Content-Length', 'X-Total-Count'],
-    maxAge: 600,
-}));
-
-app.use('/assets/*', serveStatic({ root: './' }))
-
-// --- CONFIGURATION V1 ---
-const v1 = new OpenAPIHono<AppEnv>();
-
-v1.route('/auth', authRoutes);
-v1.route('/bank-accounts', accountRoutes);
-v1.route('/categories', categoryRoutes);
-v1.route('/payment-methods', paymentMethodRoutes);
-v1.route('/monthly-payments', monthlyPaymentRoutes);
-v1.route('/transactions', transactionRoutes);
-
-v1.get('/realtime', authMiddleware, async (c) => {
-    const user = c.get('jwtPayload');
-
-    return streamSSE(c, async (stream) => {
-        const listener = (payload: any) => {
-            if (payload.userId === user.id) {
-                stream.writeSSE({
-                    data: JSON.stringify({
-                        type: payload.type,
-                        model: payload.model,
-                        data: payload.data
-                    }),
-                    event: 'message',
-                });
-            }
-        };
-
-        eventBus.on('db_change', listener);
-
-        stream.onAbort(() => {
-            eventBus.off('db_change', listener);
-        });
-
-        while (true) {
-            await stream.sleep(30000);
-            try {
-                await stream.writeSSE({data: 'heartbeat', event: 'ping'});
-            } catch {
-                eventBus.off('db_change', listener);
-                break;
-            }
-        }
-    });
-});
-
-// --- DOCUMENTATION ---
-
-app.get('/api-docs', (c) => c.redirect('/api-docs/', 301));
-app.get(
-    '/api-docs/',
-    swaggerUI({
-        url: '/api/v1/openapi.json',
-        docExpansion: 'list',
-        filter: true,
-        tagsSorter: "'alpha'",
-        operationsSorter: "'method'",
-    })
-);
-
-v1.doc('/openapi.json', {
-    openapi: '3.1.0',
-    info: {
-        title: 'Moneo API V1',
-        version: pkg.version,
-        description: `
-## Overview
-Moneo is a high-performance personal finance management API built with **Hono** and **Zod-OpenAPI**. It provides secure, type-safe endpoints to manage bank accounts, transactions, and budgets.
-
-## Key Features
-* **Real-time Synchronization**: Powered by SSE (Server-Sent Events) to keep client data in sync across all devices.
-* **Secure Authentication**: JWT-based security with support for classic email/password and Google OAuth.
-* **Type Safety**: Full Zod integration ensuring rigorous data validation for every request and response.
-* **Automated Operations**: Built-in support for processing monthly recurring payments.
-
-## Getting Started
-Most endpoints require a valid **Bearer Token** in the authorization header. You can obtain one by using the \`/auth/login\` or \`/auth/google\` endpoints.
-        `.trim(),
-    },
-    servers: [{url: `https://moneo-app.com/api/v1`, description: 'Serveur V1'}],
-});
-
-v1.openAPIRegistry.registerComponent('securitySchemes', 'Bearer', {
-    type: 'http',
-    scheme: 'bearer',
-    bearerFormat: 'JWT',
-});
-
-app.route('/api/v1', v1);
-
-app.onError((err, c) => {
-    logger.error(err, 'Erreur non interceptée');
-    return c.json({ error: 'Une erreur interne est survenue' }, 500);
-});
-
+process.on('unhandledRejection', (reason) => logger.error(reason, 'Promesse rejetée non interceptée'));
 process.on('uncaughtException', (err) => {
     logger.error(err, 'Exception non interceptée');
     process.exit(1);
 });
 
-process.on('unhandledRejection', (reason) => {
-    logger.error(reason, 'Promesse rejetée non interceptée');
-});
-
-// --- LOGIQUE SEQUELIZE & START ---
-
-const emitChange = (type: string, instance: any) => {
-    let ownerId: number | null;
-    const modelName = instance.constructor.name;
-
-    if (modelName === 'User') {
-        ownerId = instance.id;
-    } else {
-        ownerId = instance.userId || (instance.dataValues && instance.dataValues.userId);
-    }
-
-    eventBus.emit('db_change', {
-        type,
-        model: modelName,
-        userId: ownerId,
-        data: instance.toJSON ? instance.toJSON() : instance
-    });
-};
-
-sequelize.addHook('afterCreate', (instance) => emitChange('CREATE', instance));
-sequelize.addHook('afterUpdate', (instance) => emitChange('UPDATE', instance));
-sequelize.addHook('afterDestroy', (instance) => emitChange('DELETE', instance));
-
-app.get('/', (c) => c.text('Moneo API is Live'));
-
-app.get('/health', async (c) => {
-    const start = Date.now();
-    let dbStatus = 'connected';
-
-    try {
-        await sequelize.authenticate();
-    } catch {
-        dbStatus = 'disconnected';
-    }
-
-    return c.json({
-        status: dbStatus === 'connected' ? 'ok' : 'degraded',
-        version: pkg.version,
-        uptime: Math.floor(process.uptime()),
-        database: dbStatus,
-        timestamp: new Date().toISOString(),
-        responseTime: `${Date.now() - start}ms`,
-    }, dbStatus === 'connected' ? 200 : 503);
-});
-
-const startServer = async () => {
-    try {
-        await sequelize.authenticate();
-        if (process.env.NODE_ENV !== 'production') {
-            await sequelize.sync({alter: true});
-        }
-
-        await initFirebase();
-        await processMonthlyPayments();
-
-        logger.info(`Server running on port ${port} | Docs: http://localhost:${port}/api-docs`);
-        serve({fetch: app.fetch, port});
-    } catch (error) {
-        logger.error(error, 'Database connection failed');
-        process.exit(1);
-    }
-};
-
-startServer();
+void start();

@@ -2,7 +2,7 @@
 
 <div align="center">
 
-<img src="https://img.shields.io/badge/Node.js-24-339933?logo=node.js&logoColor=white"  alt="node" />
+<img src="https://img.shields.io/badge/Node.js-22-339933?logo=node.js&logoColor=white"  alt="node" />
 <img src="https://img.shields.io/badge/Hono-000?logo=hono&logoColor=FF7233"  alt="hono" />
 <img src="https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white"  alt="typescript" />
 <img src="https://img.shields.io/badge/PostgreSQL-336791?logo=postgresql&logoColor=white"  alt="postgresql" />
@@ -21,253 +21,142 @@
 
 ## Features
 
-- **Authentication** — Email/password + Google OAuth, JWT access & refresh tokens, email verification, password reset
-- **Finance management** — Bank accounts, transactions (income/expense/transfer), categories, payment methods, recurring payments
-- **Realtime** — Server-Sent Events (SSE) to push live updates to connected clients
-- **Push notifications** — Firebase Cloud Messaging (FCM) for mobile push; scheduled monthly recaps and activity reminders via cron
-- **Email** — Transactional emails via Brevo SMTP (verification, password reset)
-- **File storage** — Avatar uploads via Cloudflare R2 (S3-compatible)
-- **Security** — Rate limiting on auth routes, Zod validation on all inputs, bcrypt password hashing
-- **Documentation** — OpenAPI 3.1 spec auto-generated, Swagger UI served at `/api-docs`
+- **Accounts with computed balances** — balances are never stored: remaining, checked ("pointé") and as-of-today balances are derived from the opening balance and the entries, so they cannot drift
+- **Transactions** — income, expense, paired transfers (two mirrored legs sharing a `transferId`), reconciliation ("pointage"), advanced filters, entry suggestions, idempotent creation for offline clients
+- **Recurring payments** — per-month amount overrides, catch-up of missed months, three modes (whole month up front, on due date, manual)
+- **Chequebooks** — automatic cheque numbering, number released when the last cheque is cancelled
+- **Budgets & insights** — category budgets with alerts, period summary, monthly trend, daily balance history, 30-day forecast, pivot table (period → category → subcategory)
+- **Notifications** — in-app notification centre + FCM push on every device, quiet hours, low balance, budget, upcoming payment, monthly recap
+- **Import / export** — imports the `Comptes.xlsm` tracking workbook, JSON backup/restore, CSV export
+- **Authentication** — email/password + Google, per-device sessions with rotating opaque refresh tokens (reuse detection), hashed one-time codes, rate limiting per IP and per account
+- **Realtime** — Server-Sent Events telling clients what changed
+- **Documentation** — OpenAPI 3.1 generated from the Zod schemas, Swagger UI at `/api-docs` (non-production, or `ENABLE_API_DOCS=true`)
 
 ## Tech stack
 
 | Layer | Technology |
 |---|---|
-| Runtime | Node.js 20+ |
+| Runtime | Node.js 20.10+ (image: Node 22) |
 | Framework | [Hono](https://hono.dev) + [@hono/zod-openapi](https://github.com/honojs/middleware/tree/main/packages/zod-openapi) |
-| Database | PostgreSQL 15 via [Sequelize 6](https://sequelize.org) |
+| Database | PostgreSQL 15 (UTF-8) via [Sequelize 6](https://sequelize.org), schema managed by migrations only |
 | Validation | [Zod v4](https://zod.dev) |
-| Auth | JWT (access 5 min / refresh 7 days) + Google OAuth 2.0 |
-| Push notifications | Firebase Admin SDK (FCM) |
-| Email | Brevo SMTP via Nodemailer |
-| Storage | Cloudflare R2 (AWS S3-compatible) |
-| Scheduling | node-cron |
-| Logging | [pino](https://getpino.io) |
-| Tests | [Vitest](https://vitest.dev) |
-| CI | GitHub Actions |
+| Auth | Access JWT (15 min) + opaque refresh token (60-day sliding session, SHA-256 at rest) |
+| Passwords | scrypt (`node:crypto`) |
+| Push / email / storage | Firebase Admin (FCM) · Brevo HTTP API · Cloudflare R2 |
+| Scheduling | node-cron (in the app timezone) |
+| Tests | [Vitest](https://vitest.dev) against a real PostgreSQL |
 
 ## Architecture
 
 ```
 src/
-├── config/          # Sequelize database connection
-├── definitions/     # OpenAPI route definitions (Zod schemas → typed routes)
-├── middleware/       # JWT auth guard, rate limiter
-├── models/          # Sequelize ORM models (User, BankAccount, Transaction…)
-├── routes/          # Route handlers (auth, transactions, accounts…)
-├── schemas/         # Zod input/output schemas + unit tests
-├── services/        # Business logic (FCM, email, cron jobs)
-├── utils/           # Logger, password hashing, DB seeder
-└── index.ts         # App entry point, Hono app setup
+├── config/        # Validated environment (fail fast), Sequelize connection, Sentry
+├── db/models.ts   # All Sequelize models and associations
+├── lib/           # Dates, money, tokens, passwords, errors, events, HTTP helpers
+├── middleware/    # Bearer auth, rate limiter, security headers
+├── routes/        # OpenAPI route declarations + thin handlers
+├── services/      # Business logic: balances, transactions, recurring, stats,
+│                  # notifications, importer, jobs
+├── app.ts         # Hono app assembly (testable, no side effects)
+└── index.ts       # Process entry point: server, cron jobs, graceful shutdown
+migrations/        # Single v2 baseline migration
+test/              # Integration tests (HTTP → PostgreSQL)
 ```
 
-**Request flow:** `Hono router → Zod validation → Auth middleware → Route handler → Sequelize → PostgreSQL`
+**Request flow:** `Hono → rate limit → Zod validation → auth → handler → service → PostgreSQL`
 
-**Realtime flow:** `Sequelize model hooks → EventEmitter → SSE stream per user`
+**Realtime flow:** `service → publish(userId, event) → SSE stream` — events carry what changed (`model`, `type`, `id`, `origin`), clients refetch what they display.
+
+### Design rules
+
+- **Money** is `NUMERIC(15,2)`; amounts are signed (negative = money out). The sign is enforced server-side from the transaction type.
+- **Dates** of transactions are calendar dates (`YYYY-MM-DD`), never timestamps: no timezone drift.
+- **Ownership** of every referenced object (account, category, payment method, chequebook) is checked on every write.
+- **Idempotency**: creation endpoints accept a client-generated `id`; replaying returns `200` with the existing object, and an `id` owned by someone else returns `409` without leaking anything.
+- **Soft delete** on transactions (`deletedAt`) enables incremental sync via `GET /transactions?updatedSince=`; the bin is purged after 90 days.
 
 ## Local setup
 
-### Prerequisites
-
-- Node.js 20+
-- pnpm (`npm install -g pnpm`)
-- Docker + Docker Compose
-
-### 1. Clone and install
+Prerequisites: Node.js 20.10+, pnpm, Docker.
 
 ```bash
-git clone <repo-url>
-cd moneo-api
 pnpm install
+cp .env.example .env          # then fill in the values
+docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
 ```
 
-### 2. Configure environment variables
+This starts PostgreSQL (published on `localhost:5432`) and the API with hot reload; migrations are applied on start. Swagger UI: `http://localhost:3000/api-docs`.
 
-```bash
-cp .env.example .env
-```
-
-Edit `.env` with your values (see [Environment variables](#environment-variables) below).
-
-### 3. Start the database
-
-```bash
-docker compose up -d postgres
-```
-
-### 4. Start the API
-
-```bash
-pnpm dev
-```
-
-The server starts on `http://localhost:3000`. Swagger UI is available at `http://localhost:3000/api-docs`.
-
-> The schema is automatically synchronized on startup (`sequelize.sync({ alter: true })`). No manual migrations needed in development.
-
-### Run with Docker (full stack)
-
-```bash
-docker compose up
-```
-
-This starts both PostgreSQL and the API in development mode with hot reload.
+To run the API outside Docker against that database: set `DB_HOST=localhost`, then `pnpm migrate && pnpm dev`.
 
 ## Environment variables
 
 | Variable | Description | Required |
 |---|---|---|
-| `DATABASE_URL` | PostgreSQL connection string | Yes |
-| `ACCESS_TOKEN_SECRET` | Secret for signing access JWTs (min 32 chars) | Yes |
-| `REFRESH_TOKEN_SECRET` | Secret for signing refresh JWTs (min 32 chars) | Yes |
-| `GOOGLE_CLIENT_ID` | Google OAuth 2.0 client ID | No |
-| `BREVO_API_KEY` | Brevo API key for transactional emails | No |
-| `SMTP_FROM` | Sender address for emails | No |
-| `FIREBASE_SERVICE_ACCOUNT` | Firebase Admin SDK JSON (single line) | No |
-| `R2_ACCOUNT_ID` | Cloudflare R2 account ID | No |
-| `R2_ACCESS_KEY_ID` | Cloudflare R2 access key | No |
-| `R2_SECRET_ACCESS_KEY` | Cloudflare R2 secret key | No |
-| `R2_BUCKET_NAME` | R2 bucket name | No |
-| `R2_PUBLIC_URL` | Public base URL for R2 assets | No |
-| `PORT` | Server port (default: `3000`) | No |
-| `LOG_LEVEL` | Pino log level (default: `info`) | No |
-| `ALLOWED_ORIGINS` | Comma-separated CORS origins (default: `*`) | No |
+| `ACCESS_TOKEN_SECRET` | JWT signing secret — **32+ characters in production**, otherwise the API refuses to start | Yes |
+| `POSTGRES_USER` / `POSTGRES_PASSWORD` / `POSTGRES_DB` / `DB_HOST` / `DB_PORT` | Database connection | Yes (or `DATABASE_URL`) |
+| `DATABASE_URL` | Connection string, replaces the variables above | No |
+| `DB_SSL` | `true` for a managed database requiring TLS | No |
+| `ALLOWED_ORIGINS` | Comma-separated browser origins for CORS. Empty = none (the mobile app needs none) | No |
+| `TRUST_PROXY` | `true` **only** behind a reverse proxy writing `X-Forwarded-For`; required there for per-IP rate limiting | No |
+| `APP_TIMEZONE` | Timezone for "today", cron jobs and quiet hours (default `Europe/Paris`) | No |
+| `PUBLIC_API_URL` | Server URL advertised in the OpenAPI document | No |
+| `ENABLE_API_DOCS` | `true` to expose Swagger UI in production | No |
+| `GOOGLE_CLIENT_ID` | Enables Google sign-in | No |
+| `BREVO_API_KEY`, `SMTP_FROM` | Verification and password-reset emails | No |
+| `FIREBASE_SERVICE_ACCOUNT` | Firebase Admin JSON (single line) for push | No |
+| `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME`, `R2_PUBLIC_URL` | Avatar storage | No |
+| `UPTIME_PUSH_URL`, `SENTRY_DSN`, `LOG_LEVEL`, `PORT` | Monitoring and runtime | No |
 
-> Email, push notifications, and file storage degrade gracefully when their respective variables are absent.
+Email, push and file storage degrade gracefully when their variables are absent.
 
-## API routes
+## API overview
 
-All routes are prefixed with `/api/v1`. Authentication requires a `Bearer` token in the `Authorization` header.
+All routes are under `/api/v1` and, except the public auth routes, require `Authorization: Bearer <access token>`. The exhaustive, always up-to-date reference is the OpenAPI document (`/api/v1/openapi.json`).
 
-| Method | Path | Auth | Description |
-|---|---|---|---|
-| POST | `/auth/register` | — | Create account |
-| POST | `/auth/login` | — | Sign in with email/password |
-| POST | `/auth/google` | — | Sign in with Google ID token |
-| POST | `/auth/refresh` | — | Refresh access token |
-| POST | `/auth/logout` | Yes | Invalidate refresh token |
-| GET | `/auth/me` | Yes | Get current user profile |
-| PATCH | `/auth/me` | Yes | Update profile |
-| DELETE | `/auth/me` | Yes | Delete account and all data |
-| POST | `/auth/verify-email` | Yes | Confirm email with 6-digit code |
-| POST | `/auth/resend-verification` | Yes | Resend verification email |
-| POST | `/auth/forgot-password` | — | Request password reset |
-| POST | `/auth/reset-password` | — | Reset password with code |
-| GET | `/transactions` | Yes | List transactions (with filters) |
-| POST | `/transactions` | Yes | Create transaction |
-| PATCH | `/transactions/:id` | Yes | Update transaction |
-| DELETE | `/transactions/:id` | Yes | Delete transaction |
-| GET | `/bank-accounts` | Yes | List bank accounts |
-| POST | `/bank-accounts` | Yes | Create bank account |
-| PATCH | `/bank-accounts/:id` | Yes | Update bank account |
-| DELETE | `/bank-accounts/:id` | Yes | Delete bank account |
-| GET | `/categories` | Yes | List categories |
-| POST | `/categories` | Yes | Create category |
-| PATCH | `/categories/:id` | Yes | Update category |
-| DELETE | `/categories/:id` | Yes | Delete category |
-| GET | `/payment-methods` | Yes | List payment methods |
-| POST | `/payment-methods` | Yes | Create payment method |
-| PATCH | `/payment-methods/:id` | Yes | Update payment method |
-| DELETE | `/payment-methods/:id` | Yes | Delete payment method |
-| GET | `/monthly-payments` | Yes | List recurring payments |
-| POST | `/monthly-payments` | Yes | Create recurring payment |
-| PATCH | `/monthly-payments/:id` | Yes | Update recurring payment |
-| DELETE | `/monthly-payments/:id` | Yes | Delete recurring payment |
-| GET | `/realtime` | Yes | SSE stream for live updates |
+| Area | Routes |
+|---|---|
+| Auth | `POST /auth/register` · `login` · `google` · `refresh` · `forgot-password` · `reset-password` · `logout` · `logout-all` · `change-password` · `verify-email` · `resend-verification` |
+| Profile | `GET/PATCH/DELETE /auth/me` · `POST/DELETE /auth/me/avatar` · `GET /auth/sessions` · `DELETE /auth/sessions/{id}` · `PUT /auth/device` |
+| Bootstrap | `GET /bootstrap` — everything the app needs at launch, in one round trip |
+| Accounts | `GET/POST /accounts` · `PATCH/DELETE /accounts/{id}` · `PUT /accounts/order` |
+| Catalogue | CRUD on `/categories` (+ `/order`), `/payment-methods`, `/chequebooks` |
+| Transactions | `GET/POST /transactions` · `GET/PATCH/DELETE /transactions/{id}` · `POST /transactions/transfers` · `/batch` · `/check` · `GET /transactions/suggestions` |
+| Recurring | CRUD on `/recurring-payments` · `GET /recurring-payments/pending` · `POST /recurring-payments/run` |
+| Budgets | CRUD on `/budgets` (list includes progress and projection) |
+| Stats | `GET /stats/summary` · `monthly` · `balance-history` · `forecast` · `pivot` |
+| Notifications | `GET/DELETE /notifications` · `POST /notifications/read` · `DELETE /notifications/{id}` |
+| Data | `POST /data/import/comptes` (multipart `file`) · `POST /data/import/json` · `GET /data/export?format=json\|csv` |
+| Realtime | `GET /realtime` (SSE) |
 
-Full request/response schemas are documented in the Swagger UI.
+Errors are always `{ "error": "<message for the user>", "code": "<machine code>" }`.
 
 ## Tests
 
 ```bash
-# Run all tests
-pnpm test
-
-# Watch mode
-pnpm test:watch
-
-# Coverage report (seuil minimum : 50 % lignes/fonctions, 40 % branches)
-pnpm test:coverage
+pnpm test            # unit + integration
+pnpm test:coverage   # thresholds: 70 % lines/functions, 55 % branches
+pnpm typecheck
 ```
 
-### Ce qui est couvert
+Integration tests drive the real HTTP app against a real PostgreSQL whose schema is created by the migration itself (so the migration is tested too, including `down` → `up`):
 
-| Fichier | Ce qui est testé |
-|---|---|
-| `middleware/auth.test.ts` | Header absent → 401, token invalide/expiré → 401, token valide → payload injecté dans le contexte, secret lu depuis l'env |
-| `middleware/securityHeaders.test.ts` | Présence de chaque header OWASP (X-Content-Type-Options, X-Frame-Options, X-XSS-Protection, Referrer-Policy, Permissions-Policy), HSTS uniquement en production, statut et corps inchangés |
-| `middleware/rateLimiter.test.ts` | Requêtes sous le seuil acceptées, dépassement → 429, fenêtre glissante |
-| `schemas/auth.test.ts` | Validation Zod : email, mot de passe (complexité), champs requis/optionnels |
-| `utils/password.test.ts` | Hachage bcrypt non-réversible, vérification correcte, rejet mauvais mot de passe |
-| `routes/auth.test.ts` | Login (200/401/400), refresh (200/403), forgot-password (anti-énumération), register (201/400) |
-| `routes/bankAccount.test.ts` | CRUD complet, idempotence POST, 404, rollback sur erreur |
-| `routes/transaction.test.ts` | Liste paginée + `X-Total-Count`, création dépense/revenu (balance mise à jour), idempotence, suppression avec annulation du solde, transfert entre comptes |
-| `services/monthlyProcessor.test.ts` | Aucun paiement dû, dépense/revenu traités, rollback sur erreur, gestion fin de mois |
+- locally, an embedded PostgreSQL is started for the run — nothing to install;
+- in CI, `TEST_DATABASE_URL` points at the workflow's `postgres` service.
 
-Le rapport HTML est généré dans `coverage/` et archivé dans GitHub Actions à chaque run.
-
-## CI/CD
-
-Le pipeline GitHub Actions se déclenche sur chaque push vers `develop` et `master`.
-
-```
-push → [check] TypeScript + tests + couverture → [deploy*] docker compose up
-                                                  * master uniquement, runner self-hosted
-```
-
-### Intégration continue (toutes branches)
-
-1. Vérification TypeScript (`tsc --noEmit`)
-2. Tests unitaires avec rapport de couverture (`vitest --coverage`)
-3. Archivage du rapport de couverture (artifact GitHub Actions, 7 jours)
-
-### Déploiement continu (master uniquement)
-
-Le déploiement s'effectue via un **runner self-hosted** installé sur le conteneur LXC Proxmox qui héberge la production. Aucune clé SSH ni registry externe requis — le runner exécute directement :
-
-```bash
-docker compose up -d --build
-docker compose ps
-```
-
-### Installer le runner self-hosted
-
-Sur le LXC Ubuntu, depuis l'interface GitHub (`Settings → Actions → Runners → New self-hosted runner`) :
-
-```bash
-mkdir actions-runner && cd actions-runner
-curl -o actions-runner-linux-x64.tar.gz -L https://github.com/actions/runner/releases/latest/download/actions-runner-linux-x64-<version>.tar.gz
-tar xzf actions-runner-linux-x64.tar.gz
-./config.sh --url https://github.com/<org>/<repo> --token <TOKEN>
-sudo ./svc.sh install && sudo ./svc.sh start
-```
-
-Le runner démarre automatiquement au boot via systemd.
+Covered: authentication and session rotation, isolation between users, computed balances, transfers, chequebooks, filters, recurring generation and catch-up, statistics, budgets and alerts, workbook import and export round trip.
 
 ## Deployment
 
-### Docker Compose (production)
-
 ```bash
-cp .env.example .env   # remplir les variables
+cp .env.example .env   # fill in the values
 docker compose up -d --build
 ```
 
-### Base de données
+- The container applies pending migrations, then starts the API as a non-root user. `GET /health` returns `200` when the database is reachable, `503` otherwise; the image declares it as its health check.
+- PostgreSQL is not published on the host in the base compose file.
+- The in-memory rate limiter and the SSE event bus assume **a single API instance**. Running several replicas requires moving both to a shared store (Redis) first.
 
-Définir `DATABASE_URL` dans `.env`. Au démarrage, l'app applique automatiquement les changements de schéma non-destructifs (`sequelize.sync({ alter: true })`).
+### Upgrading from v1
 
-Pour appliquer les migrations manuellement :
-
-```bash
-npx sequelize-cli db:migrate
-```
-
-### Health check
-
-```
-GET /health
-```
-
-Retourne `200 ok` si la base est joignable, `503 degraded` sinon.
+The v2 baseline migration **drops the v1 tables**: no data is carried over. Export anything you need beforehand, then re-import your history through `POST /data/import/comptes` or `/data/import/json`. `REFRESH_TOKEN_SECRET` is no longer used.
