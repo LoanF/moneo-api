@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [2.0.0](https://github.com/LoanF/moneo-api/compare/v1.5.8...v2.0.0) (2026-11-15)
+
+
+### ⚠ BREAKING CHANGES
+
+* la migration v2 supprime les tables de la v1 et l'API change de contrat.
+
+Co-Authored-By: Claude Fable 5.2 <noreply@anthropic.com>
+
+### Features
+
+* refonte v2 de l'API (soldes calculés, sessions par appareil, parité Excel) ([0168ed7](https://github.com/LoanF/moneo-api/commit/0168ed71f7954bd40584958a7050052e016ab56c))
+
 ### [1.5.8](https://github.com/LoanF/moneo-api/compare/v1.5.7...v1.5.8) (2026-11-12)
 
 ### [1.5.7](https://github.com/LoanF/moneo-api/compare/v1.5.6...v1.5.7) (2026-10-16)
