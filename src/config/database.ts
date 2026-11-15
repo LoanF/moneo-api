@@ -1,14 +1,19 @@
 import { Sequelize } from 'sequelize';
+import { env } from './env.js';
 
-const sequelize = new Sequelize(
-    process.env.POSTGRES_DB as string,
-    process.env.POSTGRES_USER as string,
-    process.env.POSTGRES_PASSWORD as string,
-    {
-        host: process.env.DB_HOST || 'db',
-        dialect: 'postgres',
-        logging: false,
-    }
-);
+const common = {
+    dialect: 'postgres' as const,
+    logging: false as const,
+    dialectOptions: env.DB_SSL ? { ssl: { rejectUnauthorized: false } } : {},
+    pool: { max: 10, min: 0, idle: 10_000 },
+};
+
+const sequelize = env.DATABASE_URL
+    ? new Sequelize(env.DATABASE_URL, common)
+    : new Sequelize(env.POSTGRES_DB ?? 'moneo', env.POSTGRES_USER ?? 'moneo', env.POSTGRES_PASSWORD ?? '', {
+          ...common,
+          host: env.DB_HOST,
+          port: env.DB_PORT,
+      });
 
 export default sequelize;

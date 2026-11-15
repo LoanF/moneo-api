@@ -1,17 +1,18 @@
-import { verify } from 'hono/jwt';
-import type { Context, Next } from 'hono';
-import type { AppEnv, JwtPayload } from '../types.js';
+import type { MiddlewareHandler } from 'hono';
+import type { AppEnv } from '../lib/http.js';
+import { verifyAccessToken } from '../lib/tokens.js';
 
-export const authMiddleware = async (c: Context<AppEnv>, next: Next) => {
-    const authHeader = c.req.header('Authorization');
-    if (!authHeader) return c.json({ error: "Manquant" }, 401);
-
-    const token = authHeader.split(' ')[1];
-    try {
-        const payload = await verify(token, process.env.ACCESS_TOKEN_SECRET!, 'HS256') as JwtPayload;
-        c.set('jwtPayload', payload);
-        await next();
-    } catch (e) {
-        return c.json({ error: "Token invalide" }, 401);
+export const authMiddleware: MiddlewareHandler<AppEnv> = async (c, next) => {
+    const header = c.req.header('Authorization') ?? '';
+    const [scheme, token] = header.split(' ');
+    if (scheme?.toLowerCase() !== 'bearer' || !token) {
+        return c.json({ error: 'Authentification requise', code: 'unauthenticated' }, 401);
     }
+    try {
+        const claims = await verifyAccessToken(token);
+        c.set('auth', { userId: claims.sub, sessionId: claims.sid, email: claims.email });
+    } catch {
+        return c.json({ error: 'Session expirée', code: 'token_expired' }, 401);
+    }
+    await next();
 };
